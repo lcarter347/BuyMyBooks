@@ -116,6 +116,26 @@ def aboutUs():
         loggedIn = True
     return render_template('about.html', loggedIn=loggedIn)
     
+@app.route('/account', methods=['GET', 'POST'])
+def account():
+    loggedIn = False
+    if 'user' in session:
+        currentUser = session['user']
+        loggedIn = True
+    if loggedIn:
+        conn = connectToDB()
+        cur = conn.cursor()
+        q= "SELECT * FROM users WHERE email = %s;"
+        query = cur.mogrify(q, (currentUser,))
+        print query
+        cur.execute(query)
+        results = cur.fetchall()
+        print results
+        if results != []:
+            for result in results:
+                accountInfo = {"email":result[0], 'firstname':result[1], 'lastname':result[2], 'school':result[3]}
+    return render_template('account.html', loggedIn=loggedIn, accountInfo=accountInfo)
+    
 @app.route('/single', methods=['GET', 'POST'])
 def single():
     loggedIn = False
@@ -123,6 +143,14 @@ def single():
         currentUser = session['user']
         loggedIn = True
     return render_template('single.html', loggedIn=loggedIn)
+
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    loggedIn = False
+    if 'user' in session:
+        del session['user']
+    return render_template('logout.html', loggedIn=loggedIn)
+
 
 if __name__ == '__main__':
     app.debug=True

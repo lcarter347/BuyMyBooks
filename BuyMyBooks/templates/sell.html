@@ -1,0 +1,102 @@
+{% extends "layout.html" %}
+
+{% block content %}
+ <!--start-content-->
+<!--contact-->
+   <div class="contact">
+	  <div class="container">
+	  	{% if loggedIn == False %}
+    	<div class="row">
+        	<div class="col-md-6">
+          		<p>You must be logged in to sell books.</p>
+        		<p><a href="/login"><u>Login</u></a></p><br /><br />
+    			<p>Don't have an account?</p>
+        		<p><a href="/createaccount"><u>Create an account</u></a></p><br /><br /><br />
+        	</div>
+    	</div>
+		<br /><br />
+	  	{% else %}
+			<h3 class="tittle con">Start Selling</h3>
+				<div class="contact-form row">
+					<div class="col-md-6">
+				  	  <form role="form">
+		  	        	<p class="comment-form-author form-group"><label>Title:</label>
+			    	    	<input type="text" class="textbox form-control" value="" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '';}">
+				    	</p>
+			    	    <p class="comment-form-author form-group"><label>Author:</label>
+			    	    	<input type="text" class="textbox form-control" value="" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '';}">
+				    	</p>
+				    	<p class="comment-form-author form-group"><label>Description: (optional)</label>
+				    	  <textarea onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Message';}"></textarea>
+				        </p>
+				    </div>
+				    	
+				    <div class="col-md-6">
+				        <p class="comment-form-author form-group"><label>ISBN:</label>
+				     	   <input type="text" class="textbox form-control" value="" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '';}">
+				        </p>
+				        <p class="comment-form-author form-group"><label>Price:</label>
+				     	   <input type="text" class="textbox form-control" value="" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '';}">
+				        </p>
+				        <p class="comment-form-author form-group"><label>Subject:</label>
+						<select class="form-control" id="subject" size="7">
+							<option>Accounting</option>
+							<option>Anthropology</option>
+							<option>Architecture</option>
+							<option>Art/Art History</option>
+							<option>Astronomy</option>
+							<option>Biology</option>
+							<option>Business Administration</option>
+							<option>Chemistry</option>
+							<option>Classics</option>
+							<option>Communications</option>
+							<option>Computer Science</option>
+							<option>Economics</option>
+							<option>Education</option>
+							<option>Engineering</option>
+							<option>English</option>
+							<option>Environmental Science</option>
+							<option>French</option>
+							<option>Geography</option>
+							<option>Geology</option>
+							<option>German</option>
+							<option>Geography</option>
+							<option>Greek</option>
+							<option>History</option>
+							<option>International Relations</option>
+							<option>Latin</option>
+							<option>Latin American Studies</option>
+							<option>Law</option>
+							<option>Linguistics</option>
+							<option>Mathematics</option>
+							<option>Medical</option>
+							<option>Middle Eastern Studies</option>
+							<option>Philosophy</option>
+							<option>Physics</option>
+							<option>Political Science</option>
+							<option>Psychology</option>
+							<option>Religion</option>
+							<option>Sociology</option>
+							<option>Spanish</option>
+							<option>Theatre</option>
+							<option>Women and Gender Studies</option>
+						</select></p>
+						
+					</div>
+				</div>
+				<div class="contact-form row">
+					<div class="col-md-12">
+						<p class="comment-form-author form-group"><label>Picture URL:</label>
+				     	   <input type="text" class="textbox form-control" value="" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '';}">
+				        </p>
+					</div>
+				</div>
+				<input name="submit"  type="submit" id="submit" value="Submit">
+					</form>
+		        </div>
+		        <div class="clearfix"></div>
+		{% endif %}	
+  </div>
+ <!--//checkout-->
+ {% endblock %}
+      

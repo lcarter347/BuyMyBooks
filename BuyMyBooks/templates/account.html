@@ -1,0 +1,97 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="container">
+    <br />
+{% if loggedIn==False %}
+    <p>You are not logged in.</p>
+        <p><a href="/login"><u>Login</u></a></p><br /><br />
+    <p>Don't have an account?</p>
+        <p><a href="/createaccount"><u>Create an account</u></a></p><br /><br /><br />
+{% else %}
+    <div class="row">
+        <div class="col-md-6">
+            <div class = "panel panel-default">
+                <div class = "panel-heading">
+                    <h3 class = "panel-title">
+                    First Name
+                    </h3>
+                </div>
+                <div class = "panel-body">
+                 {{accountInfo['firstname']}}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class = "panel panel-default">
+               <div class = "panel-heading">
+                  <h3 class = "panel-title">
+                    Last Name
+                  </h3>
+               </div>
+                <div class = "panel-body">
+                    {{accountInfo['lastname']}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class = "panel panel-default">
+                <div class = "panel-heading">
+                    <h3 class = "panel-title">
+                    Email
+                    </h3>
+                </div>
+                <div class = "panel-body">
+                 {{accountInfo['email']}}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class = "panel panel-default">
+               <div class = "panel-heading">
+                  <h3 class = "panel-title">
+                    School
+                  </h3>
+               </div>
+                <div class = "panel-body">
+                    {{accountInfo['school']}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class = "panel panel-default">
+                <div class = "panel-heading">
+                    <h3 class = "panel-title">
+                    Books For Sale
+                    </h3>
+                </div>
+                <div class = "panel-body">
+                 You have no books for sale.
+                </div>
+            </div>
+        </div>
+    </div>
+     <div class="row">
+        <div class="col-md-12">
+            <div class = "panel panel-default">
+                <div class = "panel-heading">
+                    <h3 class = "panel-title">
+                    Past Orders
+                    </h3>
+                </div>
+                <div class = "panel-body">
+                 You have no past orders.
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+</div>
+
+
+{% endblock %}

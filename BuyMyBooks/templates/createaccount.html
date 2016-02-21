@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+
+{% block content %}
+ <!--start-content-->
+<!--account-->
+  <div class="container">
+      <br /> <br />
+     
+    {% if nameTaken == True %} 
+        <p><font color="#1399a0">There is already an account registered for that email address. Do you already have an account?
+        </font></p><br />
+        <a href="/login"><u><font color="#1399a0">Login here</font></u></a><br /><br />
+    {% endif %}
+    {% if accountCreated == True %}
+    	<p><font color="#1399a0">Your account has been created.</font></p><br />
+    	<a href="/login"><u><font color="#1399a0">Login</font></u></a><br /><br />
+    {% else %} 
+     <div class="row">
+       <div class="col-md-4"></div>
+       <div class="col-md-6 account-top heading">
+		<h3>NEW CUSTOMERS</h3>
+	   </div>
+     </div>
+       <div class="row">
+			<div class="col-md-6">
+				<form method="post" action="/createaccount">
+				<div class="address">
+					<span>First Name</span>
+					<input type="text" name="firstname" id="firstname" required>
+				</div>
+				<div class="address">
+					<span>Email Address</span>
+					<input type="text" name="email" id="email" required>
+				</div>
+				<div class="address">
+					<span>Password</span>
+					<input type="password" name="password" id="password" required>
+				</div>
+				<br />
+				<div class="address new">
+					<input type="submit" value="submit">
+				</div>
+			</div>
+			<div class="col-md-6">
+			    <div class="address">
+					<span>Last Name</span>
+					<input type="text" name="lastname" id="lastname" required>
+				</div>
+				<div class="address">
+					<span>School</span>
+					<input type="text" name="school" id="school" required>
+				</div>
+			</div>
+				</form>
+			</div>
+	{% endif %}
+      
+    
+			<div class="clearfix"></div>
+		</div>
+<!-- checkout -->
+
+{% endblock %}
