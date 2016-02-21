@@ -4,6 +4,20 @@ Author URL: http://w3layouts.com
 License: Creative Commons Attribution 3.0 Unported
 License URL: http://creativecommons.org/licenses/by/3.0/
 --*/
+
+#searchbox form input, #searchbox form button{
+	margin-top: -5px;
+	height: 5vh;
+}
+
+#booklogo{
+	height: 10vh;
+}
+
+
+.megamenu li a{
+	height: 6.5vh;
+}
 html, body{
 	font-family: 'Open Sans', sans-serif;
 	font-size: 100%;
@@ -1097,7 +1111,7 @@ span.valsa {
 	outline:none;
 	padding: 20px;
 	overflow: auto;
-	height: 200px;
+	height: 75vh;
 }
 .sky-form.col.col-4 ul {
 	padding: 0;
@@ -1673,8 +1687,9 @@ p.comment-form-author {
 	height: 150px;
 }
 .contact-form input[type="submit"] {
-	display: inline-block;
+	display: block;
 	padding: 12px 25px;
+	margin-top: 10vh;
 	  background:#252525;
 	color: #FFF;
 	font-size: 1em;
@@ -1752,7 +1767,7 @@ display:none;
    overflow:hidden;
    float:left;
    width:100%;
-   background-color: #333;
+   background-color:  #d9d9d9;
    padding: 0.6em 0 0.5em 0;
 }
 .nbs-flexisel-item {

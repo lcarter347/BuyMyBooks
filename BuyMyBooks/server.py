@@ -9,21 +9,25 @@ app = Flask(__name__)
 def mainIndex():
     return render_template('index.html')
     
-@app.route('/account', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def account():
-    return render_template('account.html')
+    return render_template('login.html')
     
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
     return render_template('checkout.html')    
     
-@app.route('/contact', methods=['GET', 'POST'])
-def contact():
-    return render_template('contact.html')
+@app.route('/sell', methods=['GET', 'POST'])
+def sell():
+    return render_template('sell.html')
     
 @app.route('/product', methods=['GET', 'POST'])
 def product():
     return render_template('product.html')
+    
+@app.route('/about', methods=['GET', 'POST'])
+def aboutUs():
+    return render_template('about.html')
     
 @app.route('/single', methods=['GET', 'POST'])
 def single():
