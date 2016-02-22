@@ -119,6 +119,7 @@ def aboutUs():
 @app.route('/account', methods=['GET', 'POST'])
 def account():
     loggedIn = False
+    accountInfo = ''
     if 'user' in session:
         currentUser = session['user']
         loggedIn = True
