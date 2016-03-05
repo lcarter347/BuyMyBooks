@@ -95,10 +95,34 @@ def checkout():
 @app.route('/sell', methods=['GET', 'POST'])
 def sell():
     loggedIn = False
+    description = ""
+    pictureurl = ""
+    listingSuccess = False
+    listingFailure = False
     if 'user' in session:
         currentUser = session['user']
         loggedIn = True
-    return render_template('sell.html', loggedIn=loggedIn)
+        if request.method == 'POST':
+            conn = connectToDB()
+            cur = conn.cursor()
+            try:
+                if request.form.get('description'):
+                    description = request.form['description']
+                if request.form.get('url'):
+                    pictureurl = request.form['url']
+                q = "INSERT INTO listedbooks (isbn, title, author, price, subject, description, pictureurl, userid ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
+                query = cur.mogrify(q, (request.form['isbn'], request.form['title'], 
+                    request.form['author'], request.form['price'], request.form['subject'], 
+                    description, pictureurl, currentUser))
+                print cur.mogrify(query)
+                cur.execute(query)
+                listingSuccess = True
+            except:
+                print("Error inserting book listing")
+                conn.rollback()
+                listingFailure = True
+            conn.commit()
+    return render_template('sell.html', loggedIn=loggedIn, listingSuccess=listingSuccess, listingFailure=listingFailure)
     
 @app.route('/product', methods=['GET', 'POST'])
 def product():

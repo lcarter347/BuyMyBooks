@@ -16,30 +16,37 @@
     	</div>
 		<br /><br />
 	  	{% else %}
+	  		{% if listingSuccess == True %}
+	  		<p><font color="#1399a0">Your book has been listed.</font></p><br /><br />
+	  		{% endif %}
+	  		{% if listingFailure == True %}
+	  		<p><font color="#1399a0">There was an error listing your book. Please try again.</font></p><br /><br />
+	  		{% endif %}
+	  		
 			<h3 class="tittle con">Start Selling</h3>
 				<div class="contact-form row">
 					<div class="col-md-6">
-				  	  <form role="form">
+				  	  <form role="form" method="post">
 		  	        	<p class="comment-form-author form-group"><label>Title:</label>
-			    	    	<input type="text" class="textbox form-control" value="" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '';}">
+			    	    	<input type="text" name="title" class="textbox form-control" value="" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '';}" required>
 				    	</p>
 			    	    <p class="comment-form-author form-group"><label>Author:</label>
-			    	    	<input type="text" class="textbox form-control" value="" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '';}">
+			    	    	<input type="text" name = "author" class="textbox form-control" value="" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '';}" required>
 				    	</p>
 				    	<p class="comment-form-author form-group"><label>Description: (optional)</label>
-				    	  <textarea onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Message';}"></textarea>
+				    	  <textarea name="description" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Message';}"></textarea>
 				        </p>
 				    </div>
 				    	
 				    <div class="col-md-6">
 				        <p class="comment-form-author form-group"><label>ISBN:</label>
-				     	   <input type="text" class="textbox form-control" value="" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '';}">
+				     	   <input type="text" name="isbn" class="textbox form-control" value="" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '';}" required>
 				        </p>
 				        <p class="comment-form-author form-group"><label>Price:</label>
-				     	   <input type="text" class="textbox form-control" value="" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '';}">
+				     	   <input type="text" name="price" class="textbox form-control" value="" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '';}" required>
 				        </p>
 				        <p class="comment-form-author form-group"><label>Subject:</label>
-						<select class="form-control" id="subject" size="7">
+						<select class="form-control" id="subject" name="subject" size="7">
 							<option>Accounting</option>
 							<option>Anthropology</option>
 							<option>Architecture</option>
@@ -87,7 +94,7 @@
 				<div class="contact-form row">
 					<div class="col-md-12">
 						<p class="comment-form-author form-group"><label>Picture URL:</label>
-				     	   <input type="text" class="textbox form-control" value="" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '';}">
+				     	   <input type="text" name="url" class="textbox form-control" value="" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '';}">
 				        </p>
 					</div>
 				</div>
