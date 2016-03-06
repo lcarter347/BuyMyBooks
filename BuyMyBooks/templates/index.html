@@ -1,137 +1,60 @@
 {% extends "layout.html" %}
 
 {% block content %}
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.js"></script>
+<script type="text/javascript" src="static/js/controller.js"></script>
  <!--start-content-->
 	<!--products-->
 	<div class="products">
-		<div class="container">
+		<div class="container" ng-controller="SearchController">
+			<div class="col-sm-3 col-md-3 pull-right" id="searchbox">
+			    	<form class="navbar-form" role="search" ng-submit="search()">
+			    	<div class="input-group">
+			        <input type="text" class="form-control" placeholder="Search" name="srch-term" id="srch-term" ng-model="searchtext">
+			        <div class="input-group-btn">
+			            <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+			        </div>
+			    	</div>
+			    	</form>
+			    </div>
 			<div class="products-grids">
-				<div class="col-md-8 products-grid-left">
-					<div class="products-grid-lft">
-						<div class="products-grd">
-							<div class="p-one simpleCart_shelfItem prd">
-								<a href="/">
-										<img src="static/images/headfirst.jpeg" alt="" class="img-responsive" />
-								</a>
-								<h4>Head First SQL</h4>
-								<p><a class="item_add" href="#"><i class="glyphicon glyphicon-shopping-cart"></i> <span class=" item_price valsa">$20</span></a></p>
-								<div class="pro-grd">
-									<a href="/">Quick View</a>
-								</div>
-							</div>	
-						</div>
-						<div class="products-grd">
-							<div class="p-one simpleCart_shelfItem prd">
-								<a href="/">
-										<img src="static/images/networking.jpeg" alt="" class="img-responsive" />
-								</a>
-								<h4>Computer Networking</h4>
-								<p><a class="item_add" href="#"><i class="glyphicon glyphicon-shopping-cart"></i> <span class=" item_price valsa">$50</span></a></p>
-								<div class="pro-grd">
-									<a href="/">Quick View</a>
-								</div>
-							</div>	
-						</div>
-						<div class="products-grd">
-							<div class="p-one simpleCart_shelfItem prd">
-								<a href="/">
-										<img src="static/images/datastructures.jpeg" alt="" class="img-responsive" />
-								</a>
-								<h4>Data Structures and Algorithm Analysis in C++</h4>
-								<p><a class="item_add" href="#"><i class="glyphicon glyphicon-shopping-cart"></i> <span class=" item_price valsa">$30</span></a></p>
-								<div class="pro-grd">
-									<a href="/">Quick View</a>
-								</div>
-							</div>	
-						</div>
-						<div class="clearfix"> </div>
-					</div>
-					<div class="products-grid-lft">
-						<div class="products-grd">
-							<div class="p-one simpleCart_shelfItem prd">
-								<a href="/">
-										<img src="static/images/puntos.jpg" alt="" class="img-responsive" />
-								</a>
-								<h4>Puntos de Partida</h4>	
-								<p><a class="item_add" href="#"><i class="glyphicon glyphicon-shopping-cart"></i> <span class=" item_price valsa">$10</span></a></p>
-								<div class="pro-grd">
-									<a href="/">Quick View</a>
-								</div>
-							</div>	
-						</div>
-						<div class="products-grd">
-							<div class="p-one simpleCart_shelfItem prd">
-								<a href="/">
-										<img src="static/images/anthro.jpg" alt="" class="img-responsive" />
-								</a>
-								<h4>Invitation to Anthropology</h4>
-								<p><a class="item_add" href="#"><i class="glyphicon glyphicon-shopping-cart"></i> <span class=" item_price valsa">$12</span></a></p>
-								<div class="pro-grd">
-									<a href="/">Quick View</a>
-								</div>
-							</div>	
-						</div>
-						<div class="products-grd">
-							<div class="p-one simpleCart_shelfItem prd">
-								<a href="/">
-										<img src="static/images/chinese.jpg" alt="" class="img-responsive" />
-								</a>
-								<h4>Integrated Chinese</h4>
-								<p><a class="item_add" href="#"><i class="glyphicon glyphicon-shopping-cart"></i> <span class=" item_price valsa">$35</span></a></p>
-								<div class="pro-grd">
-									<a href="/">Quick View</a>
-								</div>
-							</div>	
-						</div>
-						<div class="clearfix"> </div>
-					</div>
-					<div class="products-grid-lft">
-						<div class="products-grd">
-							<div class="p-one simpleCart_shelfItem prd">
-								<a href="/">
-										<img src="static/images/drama.jpg" alt="" class="img-responsive" />
-								</a>
-								<h4>Stages of Drama</h4>
-								<p><a class="item_add" href="#"><i class="glyphicon glyphicon-shopping-cart"></i> <span class=" item_price valsa">$25</span></a></p>
-								<div class="pro-grd">
-									<a href="/">Quick View</a>
-								</div>
-							</div>	
-						</div>
-						<div class="products-grd">
-							<div class="p-one simpleCart_shelfItem prd">
-								<a href="/">
-										<img src="static/images/filmart.jpg" alt="" class="img-responsive" />
-								</a>
-								<h4>Film Art</h4>
-								<p><a class="item_add" href="#"><i class="glyphicon glyphicon-shopping-cart"></i> <span class=" item_price valsa">$18</span></a></p>
-								<div class="pro-grd">
-									<a href="/">Quick View</a>
-								</div>
-							</div>	
-						</div>
-						<div class="products-grd">
-							<div class="p-one simpleCart_shelfItem prd">
-								<a href="/">
-										<img src="static/images/stats.jpg" alt="" class="img-responsive" />
-								</a>
-								<h4>Intro Stats</h4>
-								<p><a class="item_add" href="#"><i class="glyphicon glyphicon-shopping-cart"></i> <span class=" item_price valsa">$65</span></a></p>
-								<div class="pro-grd">
-									<a href="/">Quick View</a>
-								</div>
-							</div>	
-						</div>
-						<div class="clearfix"> </div>
+			<div class="col-md-8 products-grid-left scroll" id="searchresultspane">
+				<div class="row" ng-show="searched==false">
+					<div class="col-md-2"></div>
+					<div class="col-md-10"><br/>
+						<p><font color="#1399a0">Type in a book title, author, or isbn and begin your search.</font></p><br /><br />
 					</div>
 				</div>
-									<div class="col-md-4 products-grid-right">
+				<div class="row" ng-show="noresults==true">
+					<div class="col-md-2"></div>
+					<div class="col-md-10"><br/>
+						<p><font color="#1399a0">No listings matched your query.</font></p><br /><br />
+					</div>
+				</div>
+					<div class="products-grd" ng-repeat="result in searchresults">
+							<div class="p-one simpleCart_shelfItem prd">
+								<a href="/">
+									<img ng-src="" alt="" class="img-responsive" />
+								</a>
+								<h4 ng-bind="result.title"></h4>
+								<h5 ng-bind="result.author"></h5>
+								<br />
+								<h5 ng-bind="result.description"></h5>
+								<br />
+								<p><a class="item_add" href="#"><i class="glyphicon glyphicon-shopping-cart"></i> <span class=" item_price valsa" ng-bind="result.price"></span></a></p>
+							</div>	
+						</div>
+				</div>
+				
+				</div>
+				<div class="col-md-4 products-grid-right">
 					<div class="w_sidebar">
 						<section  class="sky-form">
 							<h4>Sort By</h4>
 							<div class="col col-4">
 								<div class="form-group">
-									<select class="form-control selectpicker" id="sort">
+									<select class="form-control selectpicker" id="sort" ng-model="sortby">
 									<option>Price: Low to High</option>
 								    <option>Price: High to Low</option>
 								    <option>Newest</option>
@@ -146,49 +69,33 @@
 							<h4>Subjects</h4>
 							<div class="row1 scroll-pane">
 								<div class="col col-4">
-									<label class="checkbox"><input type="checkbox" name="checkbox" checked=""><i></i>All</label>
+									<label class="checkbox"><input type="checkbox" name="all" id="all" ng-checked="true" ng-model="allsub" ng-changed="toggleCheck(allsub)"><i></i>All</label>
 								</div>
 								<div class="col col-4">
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Accounting</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Anthropology</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Architecture</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Art/Art History</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Astronomy</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Biology</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Business Administration</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox" ><i></i>Chemistry</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Classics</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Communications</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Computer Science</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Economics</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Education</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Engineering</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>English</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox" ><i></i>Environmental Science</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>French</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Geography</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Geology</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>German</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Geography</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Greek</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>History</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>International Relations</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Latin</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Latin American Studies</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Law</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Linguistics</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Mathematics</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Medical</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Middle Eastern Studies</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Philosophy</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Physics</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Political Science</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Psychology</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Religion</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Sociology</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Spanish</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Theatre</label>
-									<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Women and Gender Studies</label>
+									<label class="checkbox"><input type="checkbox" class="check" ng-model="anthro" ng-checked="allsub" ng-changed="toggleCheck(anthro)"><i></i>Anthropology</label>
+									<label class="checkbox"><input type="checkbox" class="check" ng-model="art" ng-checked="allsub" ng-changed="toggleCheck(art)"><i></i>Art</label>
+									<label class="checkbox"><input type="checkbox" class="check" ng-model="bio" ng-checked="allsub" ng-changed="toggleCheck(bio)"><i></i>Biology</label>
+									<label class="checkbox"><input type="checkbox" class="check" ng-model="buad" ng-checked="allsub" ng-changed="toggleCheck(buad)"><i></i>Business Administration</label>
+									<label class="checkbox"><input type="checkbox" class="check" ng-model="chem"  ng-checked="allsub" ng-changed="toggleCheck(chem)"><i></i>Chemistry</label>
+									<label class="checkbox"><input type="checkbox" class="check" ng-model="cs"  ng-checked="allsub" ng-changed="toggleCheck(cs)"><i></i>Computer Science</label>
+									<label class="checkbox"><input type="checkbox" class="check" ng-model="edu" ng-checked="allsub" ng-changed="toggleCheck(edu)"><i></i>Education</label>
+									<label class="checkbox"><input type="checkbox" class="check" ng-model="engineering" ng-checked="allsub" ng-changed="toggleCheck(engineering)"><i></i>Engineering</label>
+									<label class="checkbox"><input type="checkbox" class="check" ng-model="english" ng-checked="allsub" ng-changed="toggleCheck(english)"><i></i>English</label>
+									<label class="checkbox"><input type="checkbox" class="check" ng-model="foreign" ng-checked="allsub" ng-changed="toggleCheck(foreign)"><i></i>Foreign Language</label>
+									<label class="checkbox"><input type="checkbox" class="check" ng-model="geography" ng-checked="allsub" ng-changed="toggleCheck(geography)"><i></i>Geography</label>
+									<label class="checkbox"><input type="checkbox" class="check" ng-model="hist" ng-checked="allsub" ng-changed="toggleCheck(hist)"><i></i>History</label>
+									<label class="checkbox"><input type="checkbox" class="check" ng-model="ir" ng-checked="allsub" ng-changed="toggleCheck(ir)"><i></i>International Relations</label>
+									<label class="checkbox"><input type="checkbox" class="check" ng-model="law" ng-checked="allsub" ng-changed="toggleCheck(law)"><i></i>Law</label>
+									<label class="checkbox"><input type="checkbox" class="check" ng-model="math" ng-checked="allsub" ng-changed="toggleCheck(math)"><i></i>Mathematics</label>
+									<label class="checkbox"><input type="checkbox" class="check" ng-model="med" ng-checked="allsub" ng-changed="toggleCheck(med)"><i></i>Medical</label>
+									<label class="checkbox"><input type="checkbox" class="check" ng-model="other" ng-checked="allsub" ng-changed="toggleCheck(other)"><i></i>Other</label>
+									<label class="checkbox"><input type="checkbox" class="check" ng-model="philosophy" ng-checked="allsub" ng-changed="toggleCheck(philosophy)"><i></i>Philosophy</label>
+									<label class="checkbox"><input type="checkbox" class="check" ng-model="physics" ng-checked="allsub" ng-changed="toggleCheck(physics)"><i></i>Physics</label>
+									<label class="checkbox"><input type="checkbox" class="check" ng-model="polisci" ng-checked="allsub" ng-changed="toggleCheck(polisci)"><i></i>Political Science</label>
+									<label class="checkbox"><input type="checkbox" class="check" ng-model="psych" ng-checked="allsub" ng-changed="toggleCheck(psych)"><i></i>Psychology</label>
+									<label class="checkbox"><input type="checkbox" class="check" ng-model="religion" ng-checked="allsub" ng-changed="toggleCheck(religion)"><i></i>Religion</label>
+									<label class="checkbox"><input type="checkbox" class="check" ng-model="sociology" ng-checked="allsub" ng-changed="toggleCheck(sociology)"><i></i>Sociology</label>
+									<label class="checkbox"><input type="checkbox" class="check" ng-model="theatre" ng-checked="allsub" ng-changed="toggleCheck(theatre)"><i></i>Theatre</label>
 								</div>
 							</div>
 						</section>
@@ -199,6 +106,7 @@
 			</div>
 		</div>
 	</div>
+	
 <!-- //products -->
 	    
 {% endblock %}

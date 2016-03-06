@@ -20,7 +20,7 @@
 	  		<p><font color="#1399a0">Your book has been listed.</font></p><br /><br />
 	  		{% endif %}
 	  		{% if listingFailure == True %}
-	  		<p><font color="#1399a0">There was an error listing your book. Please try again.</font></p><br /><br />
+	  		<p><font color="#1399a0">There was an error listing your book. Please try again. Make sure that you specify the subject.</font></p><br /><br />
 	  		{% endif %}
 	  		
 			<h3 class="tittle con">Start Selling</h3>
@@ -28,73 +28,56 @@
 					<div class="col-md-6">
 				  	  <form role="form" method="post">
 		  	        	<p class="comment-form-author form-group"><label>Title:</label>
-			    	    	<input type="text" name="title" class="textbox form-control" value="" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '';}" required>
+			    	    	<input type="text" name="title" class="textbox form-control" required>
 				    	</p>
 			    	    <p class="comment-form-author form-group"><label>Author:</label>
-			    	    	<input type="text" name = "author" class="textbox form-control" value="" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '';}" required>
+			    	    	<input type="text" name = "author" class="textbox form-control" required>
 				    	</p>
 				    	<p class="comment-form-author form-group"><label>Description: (optional)</label>
-				    	  <textarea name="description" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Message';}"></textarea>
+				    	  <textarea name="description"></textarea>
 				        </p>
 				    </div>
 				    	
 				    <div class="col-md-6">
 				        <p class="comment-form-author form-group"><label>ISBN:</label>
-				     	   <input type="text" name="isbn" class="textbox form-control" value="" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '';}" required>
+				     	   <input type="text" name="isbn" class="textbox form-control" required>
 				        </p>
 				        <p class="comment-form-author form-group"><label>Price:</label>
-				     	   <input type="text" name="price" class="textbox form-control" value="" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '';}" required>
+				     	   <input type="text" name="price" class="textbox form-control" required>
 				        </p>
 				        <p class="comment-form-author form-group"><label>Subject:</label>
 						<select class="form-control" id="subject" name="subject" size="7">
-							<option>Accounting</option>
 							<option>Anthropology</option>
-							<option>Architecture</option>
-							<option>Art/Art History</option>
-							<option>Astronomy</option>
+							<option>Art</option>
 							<option>Biology</option>
 							<option>Business Administration</option>
 							<option>Chemistry</option>
-							<option>Classics</option>
-							<option>Communications</option>
 							<option>Computer Science</option>
-							<option>Economics</option>
 							<option>Education</option>
 							<option>Engineering</option>
 							<option>English</option>
-							<option>Environmental Science</option>
-							<option>French</option>
+							<option>Foreign Language</option>
 							<option>Geography</option>
-							<option>Geology</option>
-							<option>German</option>
-							<option>Geography</option>
-							<option>Greek</option>
 							<option>History</option>
 							<option>International Relations</option>
-							<option>Latin</option>
-							<option>Latin American Studies</option>
 							<option>Law</option>
-							<option>Linguistics</option>
 							<option>Mathematics</option>
 							<option>Medical</option>
-							<option>Middle Eastern Studies</option>
+							<option>Other</option>
 							<option>Philosophy</option>
 							<option>Physics</option>
 							<option>Political Science</option>
 							<option>Psychology</option>
 							<option>Religion</option>
 							<option>Sociology</option>
-							<option>Spanish</option>
 							<option>Theatre</option>
-							<option>Women and Gender Studies</option>
 						</select></p>
-						
-					</div>
+				</div>
 				</div>
 				<div class="contact-form row">
 					<div class="col-md-12">
 						<p class="comment-form-author form-group"><label>Picture URL:</label>
-				     	   <input type="text" name="url" class="textbox form-control" value="" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '';}">
+				     	   <input type="text" name="url" class="textbox form-control">
 				        </p>
 					</div>
 				</div>
@@ -106,4 +89,3 @@
   </div>
  <!--//checkout-->
  {% endblock %}
-      
