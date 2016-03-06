@@ -24,7 +24,7 @@ def connection():
     print('connected')
     
 @socketio.on('search', namespace='/search')    
-def search(txt, subjectfilter):
+def search(txt, subjectfilter, sortfilter):
     description = "No description available"
     conn = connectToDB()
     cur = conn.cursor()
@@ -33,15 +33,16 @@ def search(txt, subjectfilter):
     print txt
     txt = '%' + txt + '%'
     if (subjectfilter=="all"):
-        query = cur.mogrify("""SELECT lb.isbn, STRING_AGG(a.name, ', '), lb.title, lb.price, lb.subject, \
+        q = "SELECT lb.isbn, STRING_AGG(a.name, ', '), lb.title, lb.price, lb.subject, \
             lb.description, lb.pictureurl FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid \
             INNER JOIN authors as a ON atb.authorid=a.authorid WHERE LOWER(lb.title) LIKE %s OR LOWER(a.name) LIKE %s \
-            OR lb.isbn Like %s AND lb.sold=False GROUP BY lb.bookid;""", (txt, txt, txt))
+            OR lb.isbn Like %s AND lb.sold=False GROUP BY lb.bookid " + sortfilter + ";"
+        query = cur.mogrify(q, (txt, txt, txt))
     else:
         q = "SELECT lb.isbn, STRING_AGG(a.name, ', '), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl \
             FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid INNER JOIN authors as a ON \
             atb.authorid=a.authorid WHERE (lb.subject IN (" + subjectfilter + ") AND lb.sold=False) AND (LOWER(lb.title) \
-            LIKE %s OR LOWER(a.name) LIKE %s OR lb.isbn LIKE %s) GROUP BY lb.bookid;"
+            LIKE %s OR LOWER(a.name) LIKE %s OR lb.isbn LIKE %s) GROUP BY lb.bookid " + sortfilter + ";"
         query = cur.mogrify(q, (txt, txt, txt))
     
     print query

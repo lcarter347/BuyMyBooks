@@ -32,22 +32,29 @@
 						<p><font color="#1399a0">No listings matched your query.</font></p><br /><br />
 					</div>
 				</div>
-					<div class="products-grd" ng-repeat="result in searchresults">
-							<div class="p-one simpleCart_shelfItem prd">
-								<a href="/">
-									<img ng-src="" alt="" class="img-responsive" />
-								</a>
-								<h4 ng-bind="result.title"></h4>
-								<h5 ng-bind="result.author"></h5>
-								<br />
-								<h5 ng-bind="result.description"></h5>
-								<br />
-								<p><a class="item_add" href="#"><i class="glyphicon glyphicon-shopping-cart"></i> <span class=" item_price valsa" ng-bind="result.price"></span></a></p>
-							</div>	
-						</div>
+					<div class="" ng-repeat="result in searchresults">
+							<div class = "panel panel-default">
+								<div class = "panel-heading">
+                    				<h3 class = "panel-title">
+                    					<span ng-bind="result.title"></span>
+										&nbsp;&nbsp;&nbsp;&nbsp;ISBN:
+                    					<span ng-bind="result.isbn"></span>
+                    				</h3>
+                				</div>
+                				<div class = "panel-body">
+                					<h4>By:&nbsp; <span ng-bind="result.author"></span></h4>
+									<br />
+									<h4>Subject:&nbsp; <span ng-bind="result.subject"></span></h4>
+									<br />
+									<h4 ng-bind="result.description"></h4>
+									<br />
+									<p><a class="item_add" href="#"><i class="glyphicon glyphicon-shopping-cart"></i> <span class=" item_price valsa" ng-bind="result.price"></span></a></p>
+                				</div>
+            				</div>
+								
 				</div>
 				
-				</div>
+			</div>
 				<div class="col-md-4 products-grid-right">
 					<div class="w_sidebar">
 						<section  class="sky-form">
@@ -55,7 +62,7 @@
 							<div class="col col-4">
 								<div class="form-group">
 									<select class="form-control selectpicker" id="sort" ng-model="sortby">
-									<option>Price: Low to High</option>
+									<option ng-selected="true">Price: Low to High</option>
 								    <option>Price: High to Low</option>
 								    <option>Newest</option>
 								    <option>Alphabetical</option>
