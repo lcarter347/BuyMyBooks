@@ -225,6 +225,7 @@ def aboutUs():
 def account():
     loggedIn = False
     accountInfo = ''
+    listedBooks = []
     if 'user' in session:
         currentUser = session['user']
         loggedIn = True
@@ -240,9 +241,20 @@ def account():
         if results != []:
             for result in results:
                 accountInfo = {"email":result[0], 'firstname':result[1], 'lastname':result[2], 'school':result[3]}
-        """q= "SELECT isbn, title, author, price, subject, description FROM listedbooks  WHERE email = %s;"
-        query = cur.mogrify(q, (currentUser,))"""
-    return render_template('account.html', loggedIn=loggedIn, accountInfo=accountInfo)
+                
+        q = "SELECT lb.isbn, STRING_AGG(a.name, ', '), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl \
+            FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid INNER JOIN authors as a ON \
+            atb.authorid=a.authorid WHERE lb.sold=False AND lb.userid = %s GROUP BY lb.bookid ORDER BY lb.bookid DESC;"
+        query = cur.mogrify(q, (currentUser,))
+        print query
+        cur.execute(query)
+        results = cur.fetchall()
+        print results
+        if results != []:
+            for result in results:
+                listedBooks.append({"isbn":result[0], 'title':result[2], 'author':result[1], 'price':result[3], 
+                'subject':result[4], 'description':result[5], 'picture':result[6]})
+    return render_template('account.html', loggedIn=loggedIn, accountInfo=accountInfo, listedBooks=listedBooks)
     
 @app.route('/single', methods=['GET', 'POST'])
 def single():

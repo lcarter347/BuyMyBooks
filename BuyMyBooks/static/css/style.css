@@ -1710,6 +1710,9 @@ p.comment-form-author {
 	float: left;
 	width: 37%;
 }
+.pictureurl{
+	height: 25vh;
+}
 .span_2_of_contact_right h3 {
 	     font-size: 1.2em;
     font-weight: 400;

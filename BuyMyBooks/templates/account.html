@@ -70,8 +70,28 @@
                     Books For Sale
                     </h3>
                 </div>
-                <div class = "panel-body">
+                <div class = "panel-body row">
+                {% if listedBooks=="" %}
                  You have no books for sale.
+                {% else %}
+                <table class="table-bordered col-md-12">
+                    {% for result in listedBooks %}
+                    <tr>
+                    <td class="col-md-1">{{result.isbn}}</td>
+                    <td class="col-md-2">{{result.title}}</td>
+                    <td class="col-md-2">{{result.author}}</td>
+                    <td class="col-md-1">{{result.subject}}</td>
+                    {% if result.description=="" %}
+                    <td class="col-md-2">No description</td>
+                    {% else %}
+                    <td class="col-md-2">{{result.description}}</td>
+                    {% endif %}
+                    <td class="col-md-1">{{result.price}}</td>
+                    <td class="col-md-3"><img class="img-thumbnail img-responsive pictureurl" src={{result.picture}} /></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% endif %}
                 </div>
             </div>
         </div>
