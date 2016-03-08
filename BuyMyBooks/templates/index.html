@@ -32,6 +32,19 @@
 						<p><font color="#1399a0">No listings matched your query.</font></p><br /><br />
 					</div>
 				</div>
+				<div class="alert alert-success" ng-show="itemadded">
+					<a href="#" class="close" aria-label="close" ng-click="dismiss()">&times;</a>
+  					The item has been added to your cart.
+				</div>
+				<div class="alert alert-warning" ng-show="incart">
+					<a href="#" class="close" aria-label="close" ng-click="dismiss()">&times;</a>
+  					That item is already in your cart.
+				</div>
+				<div class="alert alert-danger" ng-show="error">
+					<a href="#" class="close" aria-label="close" ng-click="dismiss()">&times;</a>
+  					There was an error adding the item to your cart.
+				</div>
+			
 					<div class="" ng-repeat="result in searchresults">
 							<div class = "panel panel-default">
 								<div class = "panel-heading">
@@ -48,7 +61,13 @@
 									<br />
 									<h4 ng-bind="result.description"></h4>
 									<br />
-									<p><a class="item_add" href="#"><i class="glyphicon glyphicon-shopping-cart"></i> <span class=" item_price valsa" ng-bind="result.price"></span></a></p>
+									<form class="navbar-form" role="search" ng-submit="addToCart(result.id)">
+									{% if loggedIn==True %}
+									<p><button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-shopping-cart"></i> <span class=" item_price valsa" ng-bind="result.price"></span></button></p>
+                					{% else %}
+                					<p><button class="btn btn-default" type="submit" ng-disabled="true"><i class="glyphicon glyphicon-shopping-cart"></i> <span class=" item_price valsa" ng-bind="result.price"></span></button></p>
+                					{% endif %}
+                					</form>
                 				</div>
             				</div>
 								
@@ -114,6 +133,7 @@
 		</div>
 	</div>
 	
+
 <!-- //products -->
 	    
 {% endblock %}

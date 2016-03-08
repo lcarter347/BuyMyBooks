@@ -33,14 +33,14 @@ def search(txt, subjectfilter, sortfilter):
     print txt
     txt = '%' + txt + '%'
     if (subjectfilter=="all"):
-        q = "SELECT lb.isbn, STRING_AGG(a.name, ', '), lb.title, lb.price, lb.subject, \
-            lb.description, lb.pictureurl FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid \
+        q = "SELECT lb.isbn, STRING_AGG(a.name, ', '), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
+            lb.bookid FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid \
             INNER JOIN authors as a ON atb.authorid=a.authorid WHERE LOWER(lb.title) LIKE %s OR LOWER(a.name) LIKE %s \
             OR lb.isbn Like %s AND lb.sold=False GROUP BY lb.bookid " + sortfilter + ";"
         query = cur.mogrify(q, (txt, txt, txt))
     else:
-        q = "SELECT lb.isbn, STRING_AGG(a.name, ', '), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl \
-            FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid INNER JOIN authors as a ON \
+        q = "SELECT lb.isbn, STRING_AGG(a.name, ', '), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
+            lb.bookid FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid INNER JOIN authors as a ON \
             atb.authorid=a.authorid WHERE (lb.subject IN (" + subjectfilter + ") AND lb.sold=False) AND (LOWER(lb.title) \
             LIKE %s OR LOWER(a.name) LIKE %s OR lb.isbn LIKE %s) GROUP BY lb.bookid " + sortfilter + ";"
         query = cur.mogrify(q, (txt, txt, txt))
@@ -55,11 +55,48 @@ def search(txt, subjectfilter, sortfilter):
                 description = result[5]
             tmp = {'isbn':result[0], 'title':result[2], 'author':result[1],
             'price':result[3], 'subject':result[4], 'description':description, 
-            'pictureurl':result[6]}
+            'pictureurl':result[6], 'id':result[7]}
             emit('search', tmp)
     else:
         emit('noresults')
         print "No results"
+    
+@socketio.on('addtocart', namespace='/search')
+def addToCart(bookid):
+    if 'cart' in session:
+        pass
+    else:
+        session['cart'] = []
+        print(session['cart'])
+    if 'user' in session:
+        currentUser = session['user']
+        message = ''
+        conn = connectToDB()
+        cur = conn.cursor()
+        query = cur.mogrify("""SELECT * FROM cart WHERE userid=%s and bookid=%s;""", (currentUser, bookid))
+        print query
+        cur.execute(query)
+        results = cur.fetchall()
+        print results
+        if results != []:
+            message = 'already in cart'      
+        else:
+            try:
+                query = cur.mogrify("""INSERT INTO cart (userid, bookid) VALUES (%s, %s);""", (currentUser,bookid))
+                print cur.mogrify(query)
+                cur.execute(query)
+                message = 'item added'
+                cart = session['cart']
+                cart.append(bookid)
+                session['cart'] = cart
+            except:
+                print("Error inserting into cart")
+                conn.rollback()
+                message = 'error'  
+            conn.commit()
+        emit('addedtocart', message)  
+
+    
     
 def remove_accents(input_str):
     nfkd_form = unicodedata.normalize('NFKD', input_str)
@@ -140,6 +177,15 @@ def checkout():
     if 'user' in session:
         currentUser = session['user']
         loggedIn = True
+        conn = connectToDB()
+        cur = conn.cursor()
+        query = cur.mogrify("""SELECT * FROM cart WHERE userid=%s;""", (currentUser,))
+        print query
+        cur.execute(query)
+        results = cur.fetchall()
+        print results
+        if results != []:
+            pass
     return render_template('checkout.html', loggedIn=loggedIn)    
     
 @app.route('/sell', methods=['GET', 'POST'])
