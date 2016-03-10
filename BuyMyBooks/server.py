@@ -63,11 +63,7 @@ def search(txt, subjectfilter, sortfilter):
     
 @socketio.on('addtocart', namespace='/search')
 def addToCart(bookid):
-    if 'cart' in session:
-        pass
-    else:
-        session['cart'] = []
-        print(session['cart'])
+    cart = []
     if 'user' in session:
         currentUser = session['user']
         message = ''
@@ -86,9 +82,9 @@ def addToCart(bookid):
                 print cur.mogrify(query)
                 cur.execute(query)
                 message = 'item added'
-                cart = session['cart']
+                if 'cart' in session:
+                    cart = session['cart']
                 cart.append(bookid)
-                session['cart'] = cart
             except:
                 print("Error inserting into cart")
                 conn.rollback()
@@ -96,8 +92,7 @@ def addToCart(bookid):
             conn.commit()
         emit('addedtocart', message)  
 
-    
-    
+
 def remove_accents(input_str):
     nfkd_form = unicodedata.normalize('NFKD', input_str)
     return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])    
@@ -173,20 +168,57 @@ def createAccount():
     
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
+    cartItems = []
+    cartIds = []
     loggedIn = False
+    deleteError = False
+    deletedItem = False
     if 'user' in session:
         currentUser = session['user']
         loggedIn = True
         conn = connectToDB()
         cur = conn.cursor()
+        if request.method == 'POST':
+            itemToDelete = int(request.form['itemtodelete'])
+            print(itemToDelete)
+            try:
+                query = cur.mogrify("""DELETE FROM cart WHERE userid=%s AND bookid=%s;""", (currentUser, itemToDelete))
+                print query
+                cur.execute(query)
+                deletedItem = True
+            except:
+                    print("Error deleting from cart")
+                    deleteError = True
+                    conn.rollback()
+            conn.commit()
         query = cur.mogrify("""SELECT * FROM cart WHERE userid=%s;""", (currentUser,))
         print query
         cur.execute(query)
         results = cur.fetchall()
         print results
         if results != []:
-            pass
-    return render_template('checkout.html', loggedIn=loggedIn)    
+            for result in results:
+                cartIds.append(result[0])
+            session['cart'] = cartIds
+        print(cartIds)
+        for i in cartIds:
+            query = cur.mogrify("SELECT lb.isbn, STRING_AGG(a.name, ', '), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
+                lb.bookid FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid INNER JOIN authors as a ON atb.authorid=a.authorid \
+                WHERE lb.bookid=%s GROUP BY lb.bookid;""", (i,))
+            print query
+            cur.execute(query)
+            result = cur.fetchall()
+            for res in result:
+                if res[5] != "":
+                    description = res[5]
+                else:
+                    description = "No description available"
+                tmp = {'isbn':res[0], 'title':res[2], 'author':res[1], 'price':res[3], 
+                'subject':res[4], 'description':description, 
+                'picture':res[6], 'id':res[7]}
+                cartItems.append(tmp)
+    print(cartItems)
+    return render_template('checkout.html', loggedIn=loggedIn, cartItems=cartItems, deleteError=deleteError, deletedItem=deletedItem)    
     
 @app.route('/sell', methods=['GET', 'POST'])
 def sell():
