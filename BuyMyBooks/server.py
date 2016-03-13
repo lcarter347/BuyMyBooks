@@ -259,7 +259,8 @@ def sell():
                     print(authorids)
                 title = remove_accents(request.form['title'])
                 q = "INSERT INTO listedbooks (isbn, title, price, subject, description, pictureurl, userid) VALUES (%s, %s, %s, %s, %s, %s, %s);"
-                query = cur.mogrify(q, (request.form['isbn'], title, request.form['price'], request.form['subject'], description, pictureurl, currentUser))
+                query = cur.mogrify(q, (request.form['isbn'], title, request.form['price'], 
+                    request.form['subject'], description, pictureurl, currentUser))
                 print(query)
                 cur.execute(query)
                 query = cur.mogrify("SELECT bookid FROM listedbooks ORDER BY bookid DESC LIMIT 1;")
