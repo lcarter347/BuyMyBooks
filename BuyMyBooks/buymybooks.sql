@@ -354,7 +354,7 @@ INSERT INTO cart (userid, bookid) VALUES ('bderry@mail.com', 26);
 
 DROP ROLE IF EXISTS bookuser;
 CREATE ROLE bookuser LOGIN PASSWORD 'Lv+;92>&';
-GRANT SELECT, INSERT on users TO bookuser;
+GRANT SELECT, INSERT, UPDATE on users TO bookuser;
 GRANT SELECT, INSERT, UPDATE on listedbooks TO bookuser;
 GRANT SELECT, INSERT on authors TO bookuser;
 GRANT SELECT, INSERT on authortobook TO bookuser;

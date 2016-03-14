@@ -7,9 +7,7 @@ import unicodedata
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-
 socketio = SocketIO(app)
-
 def connectToDB():
     connectionString = 'dbname=buymybooks user=bookuser password=Lv+;92>& host=localhost'
     print connectionString
@@ -304,12 +302,44 @@ def account():
     loggedIn = False
     accountInfo = ''
     listedBooks = []
+    editFailure = False
     if 'user' in session:
         currentUser = session['user']
         loggedIn = True
     if loggedIn:
         conn = connectToDB()
         cur = conn.cursor()
+        if request.method == 'POST':
+            if request.form.get('firstname'):
+                try:
+                    query = cur.mogrify("""UPDATE users SET firstname=%s WHERE email=%s;""", (request.form['firstname'], currentUser))
+                    print(query)
+                    cur.execute(query)
+                    conn.commit()
+                except:
+                    print("Error editing first name")
+                    conn.rollback()
+                    editFailure = True
+            if request.form.get('lastname'):
+                try:
+                    query = cur.mogrify("""UPDATE users SET lastname=%s WHERE email=%s;""", (request.form['lastname'], currentUser))
+                    print(query)
+                    cur.execute(query)
+                    conn.commit()
+                except:
+                    print("Error editing last name")
+                    conn.rollback()
+                    editFailure = True
+            if request.form.get('school'):
+                try:
+                    query = cur.mogrify("""UPDATE users SET school=%s WHERE email=%s;""", (request.form['school'], currentUser))
+                    print(query)
+                    cur.execute(query)
+                    conn.commit()
+                except:
+                    print("Error editing school")
+                    conn.rollback()
+                    editFailure = True
         q= "SELECT * FROM users WHERE email = %s;"
         query = cur.mogrify(q, (currentUser,))
         print query
@@ -332,6 +362,7 @@ def account():
             for result in results:
                 listedBooks.append({"isbn":result[0], 'title':result[2], 'author':result[1], 'price':result[3], 
                 'subject':result[4], 'description':result[5], 'picture':result[6]})
+        
     return render_template('account.html', loggedIn=loggedIn, accountInfo=accountInfo, listedBooks=listedBooks)
     
 @app.route('/single', methods=['GET', 'POST'])

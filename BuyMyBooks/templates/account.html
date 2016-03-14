@@ -18,8 +18,17 @@
                     First Name
                     </h3>
                 </div>
-                <div class = "panel-body">
-                 {{accountInfo['firstname']}}
+                <div class = "panel-body row">
+                    <div class="col-md-10" id="displayfirstname">{{accountInfo['firstname']}}</div>   
+                    <div class="col-md-10">
+                        <form name="changefirstname" method="post">
+                            <input type="text" id="firstname" name="firstname" value="{{accountInfo['firstname']}}" hidden>
+                        </form>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="btn btn-info" id="editfirstname">Edit</button>
+                        <button type="button" class="btn btn-info" id="doneeditfirstname" onClick="document.forms['changefirstname'].submit();">Done</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -30,8 +39,17 @@
                     Last Name
                   </h3>
                </div>
-                <div class = "panel-body">
-                    {{accountInfo['lastname']}}
+                <div class = "panel-body row">
+                    <div class="col-md-10" id="displaylastname">{{accountInfo['lastname']}}</div>
+                    <div class="col-md-10">
+                        <form name="changelastname" method="post">
+                            <input type="text" id="lastname" name="lastname" value="{{accountInfo['lastname']}}" hidden>
+                        </form>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" id="editlastname" class="btn btn-info">Edit</button>
+                        <button type="button" class="btn btn-info" id="doneeditlastname" onClick="document.forms['changelastname'].submit();">Done</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -56,8 +74,17 @@
                     School
                   </h3>
                </div>
-                <div class = "panel-body">
-                    {{accountInfo['school']}}
+                <div class = "panel-body row">
+                    <div class="col-md-10" id="displayschool">{{accountInfo['school']}}</div>
+                    <div class="col-md-10">
+                        <form name="changeschool" method="post">
+                            <input type="text" id="school" name="school" value="{{accountInfo['school']}}" hidden>
+                        </form>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" id="editschool" class="btn btn-info">Edit</button>
+                        <button type="button" class="btn btn-info" id="doneeditschool" onClick="document.forms['changeschool'].submit();">Done</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -89,6 +116,10 @@
                     {% endif %}
                     <td class="col-md-1">{{result.price}}</td>
                     <td class="col-md-3"><img class="img-thumbnail img-responsive pictureurl" src={{result.picture}} /></td>
+                    <td class="col-md-1">
+                        &nbsp;&nbsp;<button type="button" class="btn btn-info" onClick="">Edit</button><br /><br />
+                        <button type="button" class="btn btn-info" onClick="">Delete</button>
+                        </td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -114,5 +145,64 @@
 {% endif %}
 </div>
 
+<script>
+$(document).ready(function(){
+    $("#doneeditfirstname").hide();
+    $("#doneeditlastname").hide();
+    $("#doneeditschool").hide();
+    
+    function resizeInput() {
+        if ($(this).val().length > 60){
+            $(this).attr('size', 60);
+        } else {
+            $(this).attr('size', $(this).val().length);
+        }
+    }
 
+    $('input[type="text"]').keyup(resizeInput).each(resizeInput);
+    
+    $("#editfirstname").click(function(){
+        $("#displayfirstname").hide();
+        $("#editfirstname").hide();
+        $("#firstname").show();
+        $("#doneeditfirstname").show();
+    });
+    
+    $("#doneeditfirstname").click(function(){
+        $("#displayfirstname").show();
+        $("#editfirstname").show();
+        $("#firstname").hide();
+        $("#doneeditfirstname").hide();
+    });
+    
+     $("#editlastname").click(function(){
+        $("#displaylastname").hide();
+        $("#editlastname").hide();
+        $("#lastname").show();
+        $("#doneeditlastname").show();
+    });
+    
+    $("#doneeditlastname").click(function(){
+        $("#displaylastname").show();
+        $("#editlastname").show();
+        $("#lastname").hide();
+        $("#doneeditlastname").hide();
+    });
+
+     $("#editschool").click(function(){
+        $("#displayschool").hide();
+        $("#editschool").hide();
+        $("#school").show();
+        $("#doneeditschool").show();
+    });
+    
+    $("#doneeditschool").click(function(){
+        $("#displayschool").show();
+        $("#editschool").show();
+        $("#school").hide();
+        $("#doneeditschool").hide();
+    });
+
+});
+</script>
 {% endblock %}
