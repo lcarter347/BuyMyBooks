@@ -344,6 +344,10 @@ def account():
                     
             if request.form.get('itemtodelete'):
                 try:
+                    query = cur.mogrify("""DELETE FROM authors as a USING authortobook as atb WHERE atb.authorid=a.authorid \
+                    AND atb.bookid=%s;""", (request.form['itemtodelete'],))
+                    print(query)
+                    cur.execute(query)
                     query = cur.mogrify("""DELETE FROM listedbooks WHERE bookid=%s;""", (request.form['itemtodelete'],))
                     print(query)
                     cur.execute(query)

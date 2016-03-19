@@ -38,20 +38,20 @@ CREATE TABLE authors (
 
 DROP TABLE IF EXISTS authortobook;
 CREATE TABLE authortobook (
-  authorid INT NOT NULL REFERENCES authors(authorid),
-  bookid INT NOT NULL REFERENCES listedbooks(bookid)
+  authorid INT NOT NULL REFERENCES authors(authorid) ON DELETE CASCADE,
+  bookid INT NOT NULL REFERENCES listedbooks(bookid) ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS soldbooks;
 CREATE TABLE soldbooks (
-  bookid INT NOT NULL REFERENCES listedbooks(bookid),
+  bookid INT NOT NULL REFERENCES listedbooks(bookid) ON DELETE RESTRICT,
   userid TEXT NOT NULL REFERENCES users(email),
   purchasedate DATE NOT NULL
 );
 
 DROP TABLE IF EXISTS cart;
 CREATE TABLE cart(
-  bookid INT NOT NULL REFERENCES listedbooks(bookid),
+  bookid INT NOT NULL REFERENCES listedbooks(bookid) ON DELETE CASCADE,
   userid TEXT NOT NULL REFERENCES users(email)
 );
   
@@ -356,7 +356,7 @@ DROP ROLE IF EXISTS bookuser;
 CREATE ROLE bookuser LOGIN PASSWORD 'Lv+;92>&';
 GRANT SELECT, INSERT, UPDATE on users TO bookuser;
 GRANT SELECT, INSERT, UPDATE, DELETE on listedbooks TO bookuser;
-GRANT SELECT, INSERT on authors TO bookuser;
+GRANT SELECT, INSERT, DELETE on authors TO bookuser;
 GRANT SELECT, INSERT on authortobook TO bookuser;
 GRANT USAGE on listedbooks_bookid_seq TO bookuser;
 GRANT USAGE on authors_authorid_seq TO bookuser;
