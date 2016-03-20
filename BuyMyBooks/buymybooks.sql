@@ -43,7 +43,7 @@ DROP TABLE IF EXISTS soldbooks;
 CREATE TABLE soldbooks (
   bookid INT NOT NULL REFERENCES listedbooks(bookid) ON DELETE RESTRICT,
   userid TEXT NOT NULL REFERENCES users(email),
-  purchasedate DATE NOT NULL
+  purchasedate TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
 DROP TABLE IF EXISTS cart;

@@ -4,6 +4,8 @@ import psycopg2.extras
 from flask import Flask, session, render_template, request, redirect, url_for, make_response
 from flask.ext.socketio import SocketIO, emit
 import unicodedata
+import time
+import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -34,13 +36,13 @@ def search(txt, subjectfilter, sortfilter):
     if (subjectfilter=="all"):
         q = "SELECT lb.isbn, STRING_AGG(a.name, ', '), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
             lb.bookid FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid \
-            INNER JOIN authors as a ON atb.authorid=a.authorid WHERE LOWER(lb.title) LIKE %s OR LOWER(a.name) LIKE %s \
-            OR lb.isbn =%s AND lb.sold=False GROUP BY lb.bookid " + sortfilter + ";"
+            INNER JOIN authors as a ON atb.authorid=a.authorid WHERE lb.sold IS false AND (LOWER(lb.title) LIKE %s OR LOWER(a.name) LIKE %s \
+            OR lb.isbn =%s) GROUP BY lb.bookid " + sortfilter + ";"
         query = cur.mogrify(q, (txt, txt, txt2))
     else:
         q = "SELECT lb.isbn, STRING_AGG(a.name, ', '), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
             lb.bookid FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid INNER JOIN authors as a ON \
-            atb.authorid=a.authorid WHERE (lb.subject IN (" + subjectfilter + ") AND lb.sold=False) AND (LOWER(lb.title) \
+            atb.authorid=a.authorid WHERE (lb.subject IN (" + subjectfilter + ") AND lb.sold IS false) AND (LOWER(lb.title) \
             LIKE %s OR LOWER(a.name) LIKE %s OR lb.isbn=%s) GROUP BY lb.bookid " + sortfilter + ";"
         query = cur.mogrify(q, (txt, txt, txt))
     
@@ -173,7 +175,7 @@ def checkout():
     loggedIn = False
     deleteError = False
     deletedItem = False
-    total = 0
+    subtotal = 0
     if 'user' in session:
         currentUser = session['user']
         loggedIn = True
@@ -214,14 +216,15 @@ def checkout():
                     description = res[5]
                 else:
                     description = "No description available"
-                total += res[3]
+                subtotal += res[3]
                 tmp = {'isbn':res[0], 'title':res[2], 'author':res[1], 'price':res[3], 
                 'subject':res[4], 'description':description, 
                 'picture':res[6], 'id':res[7]}
                 cartItems.append(tmp)
+        session['subtotal'] = subtotal
     print(cartItems)
-    session['total'] = total
-    return render_template('cart.html', loggedIn=loggedIn, cartItems=cartItems, deleteError=deleteError, deletedItem=deletedItem, total=total)    
+    return render_template('cart.html', loggedIn=loggedIn, cartItems=cartItems, 
+    deleteError=deleteError, deletedItem=deletedItem, subtotal=subtotal)    
     
 @app.route('/sell', methods=['GET', 'POST'])
 def sell():
@@ -291,23 +294,68 @@ def pay():
     loggedIn = False
     itemcount = 0
     complete = False
+    subtotal = 0
+    if 'subtotal' in session:
+        subtotal = session['subtotal']
+    tax = 0
+    total = 0
+    date = ''
+    purchasedItems=[]
     if 'user' in session:
         currentUser = session['user']
         loggedIn = True
-        if 'total' in session:
-            subtotal = session['total']
-            tax = subtotal * 0.053
-            total = subtotal + tax + 3
-            subtotal = '%.2f' %  subtotal
-            tax = '%.2f' %  tax
-            total = '%.2f' %  total
         if 'cart' in session:
             cartItems = session['cart']
             for item in cartItems:
                 itemcount += 1
-    if request.method=="POST":
-        complete = True
-    return render_template('checkout.html', loggedIn=loggedIn, subtotal=subtotal, itemcount = itemcount, tax=tax, total=total, complete=complete)
+        if request.method=="POST":
+            conn = connectToDB()
+            cur = conn.cursor()
+            currentTime = time.time()
+            date = datetime.datetime.fromtimestamp(currentTime).strftime('%Y-%m-%d %H:%M:%S')
+            try:
+                for item in cartItems:
+                    query = cur.mogrify("""INSERT INTO soldbooks (bookid, userid, purchasedate) VALUES (%s, %s, %s);""", (item, 
+                        currentUser, date))
+                    print(query)
+                    cur.execute(query)
+                    query = cur.mogrify("""UPDATE listedbooks SET sold='true' WHERE bookid=%s;""", (item,))
+                    print(query)
+                    cur.execute(query)
+                    query = cur.mogrify("""DELETE FROM cart WHERE bookid=%s;""", (item,))
+                    print query
+                    cur.execute(query)
+                    query = cur.mogrify("SELECT lb.isbn, STRING_AGG(a.name, ', '), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
+                    lb.bookid FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid INNER JOIN authors as a ON atb.authorid=a.authorid \
+                    WHERE lb.bookid=%s GROUP BY lb.bookid;""", (item,))
+                    print query
+                    cur.execute(query)
+                    result = cur.fetchall()
+                    for res in result:
+                        if res[5] != "":
+                            description = res[5]
+                        else:
+                            description = "No description available"
+                        tmp = {'isbn':res[0], 'title':res[2], 'author':res[1], 'price':res[3], 
+                            'subject':res[4], 'description':description, 
+                            'picture':res[6], 'id':res[7]}
+                        purchasedItems.append(tmp)
+                print(purchasedItems)
+                complete = True
+            except:
+                print "Error completing purchase"
+                conn.rollback()
+            conn.commit()
+            date = datetime.datetime.fromtimestamp(currentTime).strftime('%B %d, %Y')
+        subtotal = float(subtotal)
+        tax = subtotal * 0.053
+        total = subtotal + tax + 5
+        subtotal = '%.2f' %  subtotal
+        tax = '%.2f' %  tax
+        total = '%.2f' %  total
+            
+    return render_template('checkout.html', loggedIn=loggedIn, subtotal=subtotal, itemcount = itemcount, 
+    tax=tax, total=total, complete=complete, purchasedItems=purchasedItems, date=date)
     
 @app.route('/about', methods=['GET', 'POST'])
 def aboutUs():

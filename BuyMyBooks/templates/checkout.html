@@ -6,12 +6,14 @@
 <!-- checkout -->
 <div class="container">
     <br />
+{% if loggedIn == true %}
     {% if complete == false %}
     <form method="post">
     <div class="row">
-        <div class="col-md-3"></div>
         <div class="col-md-6">
-        
+            <div class="">
+                <h2><strong>Payment Info</strong></h2>
+            </div><br /><br />
             <div class="">
     		    <h3>Name on Card</h3>
                 <input class='form-control' name='cardholdername' type='text' required>
@@ -27,16 +29,44 @@
                 </div>
     		    <div class="col-md-4">
                     <h3>Expiration</h3>
-                    <input class='form-control' name='expirationmonth' type='text' placeholder="MM" required>
+                    <input class='form-control' name='expirationmonth' type='text' placeholder="MM" maxlength='2' required>
                 </div>
                 <div class="col-md-4">
                     <h3>&nbsp;</h3>
-                    <input class='form-control' name='expirationyear' type='text' placeholder="YYYY" required>
+                    <input class='form-control' name='expirationyear' type='text' placeholder="YYYY" maxlength='4' required>
                 </div>
             </div>
         </div>
-        <div class="col-md-3"></div>
-    </div><br /><br />
+        <div class="col-md-6">
+            <div class="">
+                <h2><strong>Shipping Address</strong></h2>
+            </div><br /><br />
+             <div class="">
+    		    <h3>Street</h3>
+                <input class='form-control' name='street' type='text' required>
+            </div><br /><br />
+             <div class="row">
+                 <div class="col-md-4">
+        		    <h3>City</h3>
+                    <input class='form-control' name='city' type='text' required>
+                </div>
+                <div class="col-md-4">
+        		    <h3>State</h3>
+                    <input class='form-control' name='state' type='text' required>
+                </div>
+                <div class="col-md-4">
+        		    <h3>Zip Code</h3>
+                    <input class='form-control' name='zipcode' type='text' required>
+                </div>
+            </div><br /><br />
+            <div class="col-md-1"></div>
+            <div class="col-md-10">
+                <label><input type="checkbox" name="billingaddress"> Use as billing address</label>
+                
+            </div><br /><br />
+            <div class="col-md-1"></div>
+        </div>
+    </div><br /><br /><br />
     <div class="row">
         <div class="col-md-3"></div>
         <div class="col-md-6">
@@ -62,7 +92,7 @@
                         </tr>
                         <tr>
                             <td class="col-md-6" align="center">Shipping:</td>
-                            <td class="col-md-6" align="center">$3.00</td>
+                            <td class="col-md-6" align="center">$5.00</td>
                         </tr>
                         <tr>
                             <td class="col-md-6" align="center"><strong>Total:</strong></td>
@@ -93,11 +123,53 @@
             <span class="glyphicon glyphicon-ok"></span>
           </h3>
         </div>
-        <div class = "panel-body">
-             Your order has been completed.
+        <div class = "panel-body row">
+            <div class="row">
+                <div class="col-md-12">
+                   <span>&nbsp;&nbsp;&nbsp;Your order has been completed. Here is your receipt.</span>
+                </div><br /><br />
+                <div class="col-md-12">
+                <table class="table-bordered col-md-12">
+                    <tr>
+                    <div class="col-md-12">
+                            <div class="col-md-2" align="center"><span>{{date}}</span></div>
+                            <div class="col-md-2" align="center"><span>Items:  &nbsp;{{itemcount}}</span></div>
+                            <div class="col-md-2" align="center"><span>Subtotal:  &nbsp;${{subtotal}}</span></div>
+                            <div class="col-md-2" align="center"><span>Tax:  &nbsp;${{tax}}</span></div>
+                            <div class="col-md-2" align="center"><span>Shipping:  &nbsp;$5.00</span></div>
+                            <div class="col-md-2" align="center"><span><strong>Total:  &nbsp;${{total}}</strong></span></div>
+                    </div>
+                    </tr>
+                </table>
+                </div>
+            </div><br />
+             
+            <table class="table-bordered col-md-12">
+                    {% for result in purchasedItems %}
+                <tr>
+                    <td class="col-md-1">{{result.isbn}}</td>
+                    <td class="col-md-2">{{result.title}}</td>
+                    <td class="col-md-2">{{result.author}}</td>
+                    <td class="col-md-1">{{result.subject}}</td>
+                    {% if result.description=="" %}
+                    <td class="col-md-2">No description</td>
+                    {% else %}
+                    <td class="col-md-2">{{result.description}}</td>
+                    {% endif %}
+                    <td class="col-md-1">${{result.price}}</td>
+                    <td class="col-md-3"><img class="img-thumbnail img-responsive pictureurl" src={{result.picture}} /></td>
+                </tr>
+                {% endfor %}
+            </table>
+            
         </div>
         </div>
     {% endif %}
+{% else %}
+    <div>
+	    <br /><br /><p>You must be logged in to checkout.</p><br /><br />
+	</div>
+{% endif %}
     </div>
     <br /><br /><br />
 
