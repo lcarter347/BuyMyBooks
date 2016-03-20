@@ -4,26 +4,23 @@ CREATE DATABASE  buymybooks;
 
 CREATE EXTENSION pgcrypto;
 
---
--- Table structure for table City
---
 
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (
-  email TEXT PRIMARY KEY,
-  firstname TEXT NOT NULL,
-  lastname TEXT NOT NULL,
-  school TEXT NOT NULL,
-  password TEXT NOT NULL
+  email TEXT PRIMARY KEY CONSTRAINT valid_email CHECK(email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
+  firstname TEXT NOT NULL CONSTRAINT valid_first_name CHECK(firstname ~* '^[A-Za-z''\-\.\s]+$'),
+  lastname TEXT NOT NULL CONSTRAINT valid_last_name CHECK(lastname ~* '^[A-Za-z''\-\.\s]+$'),
+  school TEXT NOT NULL CONSTRAINT valid_school CHECK(school ~* '^[A-Za-z''\-\.\s]+$'),
+  password TEXT NOT NULL CONSTRAINT valid_password CHECK(password ~* '^.+$')
 ) ;
 
 DROP TABLE IF EXISTS listedbooks;
 CREATE TABLE listedbooks (
   bookid SERIAL PRIMARY KEY,
-  isbn TEXT NOT NULL,
-  title TEXT NOT NULL,
-  price MONEY NOT NULL,
-  subject TEXT NOT NULL,
+  isbn TEXT NOT NULL CONSTRAINT valid_isbn CHECK(isbn ~*'^[A-Z0-9\-]{10,14}$'),
+  title TEXT NOT NULL CONSTRAINT valid_title CHECK(title ~* '^.+$'),
+  price NUMERIC(10, 2) NOT NULL CONSTRAINT valid_price CHECK(price > 0),
+  subject TEXT NOT NULL CONSTRAINT valid_subject CHECK(subject ~* '^.+$'),
   description TEXT,
   pictureurl TEXT,
   userid TEXT NOT NULL REFERENCES users(email),
@@ -33,7 +30,7 @@ CREATE TABLE listedbooks (
 DROP TABLE IF EXISTS authors;
 CREATE TABLE authors (
   authorid SERIAL PRIMARY KEY,
-  name TEXT NOT NULL
+  name TEXT NOT NULL CONSTRAINT valid_author_name CHECK(name ~* '^[A-Za-z''\-\.\s]+$')
 );
 
 DROP TABLE IF EXISTS authortobook;
@@ -119,7 +116,7 @@ INSERT INTO authors (name) VALUES ('Michael L. Cain');
 INSERT INTO authors (name) VALUES ('Steven A. Wasserman');
 INSERT INTO authors (name) VALUES ('Peter V. Minorsky');
 INSERT INTO authors (name) VALUES ('Robert B. Jackson');
-INSERT INTO listedbooks (isbn, title, price, subject, description, pictureurl, userid) VALUES (' 0321775651', 'Campbell Biology', '65', 'Biology', 'Helps launch you to success in biology through its clear and engaging narrative.', 'http://ecx.images-amazon.com/images/I/41B8tOvRAuL._SX412_BO1,204,203,200_.jpg', 'aperkins@mail.com');
+INSERT INTO listedbooks (isbn, title, price, subject, description, pictureurl, userid) VALUES ('0321775651', 'Campbell Biology', '65', 'Biology', 'Helps launch you to success in biology through its clear and engaging narrative.', 'http://ecx.images-amazon.com/images/I/41B8tOvRAuL._SX412_BO1,204,203,200_.jpg', 'aperkins@mail.com');
 INSERT INTO authortobook (authorid, bookid) VALUES (15, 9);
 INSERT INTO authortobook (authorid, bookid) VALUES (16, 9);
 INSERT INTO authortobook (authorid, bookid) VALUES (17, 9);
@@ -351,6 +348,14 @@ INSERT INTO cart (userid, bookid) VALUES ('bderry@mail.com', 31);
 INSERT INTO cart (userid, bookid) VALUES ('bderry@mail.com', 4);
 INSERT INTO cart (userid, bookid) VALUES ('bderry@mail.com', 26);
 
+CREATE INDEX lb_subject_index ON listedbooks(subject);
+CREATE INDEX lb_isbn_index ON listedbooks(isbn);
+CREATE INDEX atb_authorid_index ON authortobook(authorid);
+CREATE INDEX atb_bookid_index ON authortobook(bookid);
+CREATE INDEX cart_bookid_index ON cart(bookid);
+CREATE INDEX cart_userid_index ON cart(userid);
+CREATE INDEX sold_userid_index ON soldbooks(userid);
+CREATE INDEX sold_bookid_index ON soldbooks(bookid);
 
 DROP ROLE IF EXISTS bookuser;
 CREATE ROLE bookuser LOGIN PASSWORD 'Lv+;92>&';

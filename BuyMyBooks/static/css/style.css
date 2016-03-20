@@ -5,6 +5,10 @@ License: Creative Commons Attribution 3.0 Unported
 License URL: http://creativecommons.org/licenses/by/3.0/
 --*/
 
+.checkoutbtn{
+	background-color: #18C9D2;
+}
+
 #searchbox form input, #searchbox form button{
 	margin-top: -5px;
 	height: 5vh;

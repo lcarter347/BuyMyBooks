@@ -29,18 +29,19 @@ def search(txt, subjectfilter, sortfilter):
     txt = txt.lower()
     txt = remove_accents(txt)
     print txt
+    txt2 = txt
     txt = '%' + txt + '%'
     if (subjectfilter=="all"):
         q = "SELECT lb.isbn, STRING_AGG(a.name, ', '), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
             lb.bookid FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid \
             INNER JOIN authors as a ON atb.authorid=a.authorid WHERE LOWER(lb.title) LIKE %s OR LOWER(a.name) LIKE %s \
-            OR lb.isbn Like %s AND lb.sold=False GROUP BY lb.bookid " + sortfilter + ";"
-        query = cur.mogrify(q, (txt, txt, txt))
+            OR lb.isbn =%s AND lb.sold=False GROUP BY lb.bookid " + sortfilter + ";"
+        query = cur.mogrify(q, (txt, txt, txt2))
     else:
         q = "SELECT lb.isbn, STRING_AGG(a.name, ', '), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
             lb.bookid FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid INNER JOIN authors as a ON \
             atb.authorid=a.authorid WHERE (lb.subject IN (" + subjectfilter + ") AND lb.sold=False) AND (LOWER(lb.title) \
-            LIKE %s OR LOWER(a.name) LIKE %s OR lb.isbn LIKE %s) GROUP BY lb.bookid " + sortfilter + ";"
+            LIKE %s OR LOWER(a.name) LIKE %s OR lb.isbn=%s) GROUP BY lb.bookid " + sortfilter + ";"
         query = cur.mogrify(q, (txt, txt, txt))
     
     print query
@@ -51,8 +52,9 @@ def search(txt, subjectfilter, sortfilter):
         for result in results:
             if result[5] != "":
                 description = result[5]
+            price = str(result[3])
             tmp = {'isbn':result[0], 'title':result[2], 'author':result[1],
-            'price':result[3], 'subject':result[4], 'description':description, 
+            'price':price, 'subject':result[4], 'description':description, 
             'pictureurl':result[6], 'id':result[7]}
             emit('search', tmp)
     else:
@@ -171,6 +173,7 @@ def checkout():
     loggedIn = False
     deleteError = False
     deletedItem = False
+    total = 0
     if 'user' in session:
         currentUser = session['user']
         loggedIn = True
@@ -211,12 +214,14 @@ def checkout():
                     description = res[5]
                 else:
                     description = "No description available"
+                total += res[3]
                 tmp = {'isbn':res[0], 'title':res[2], 'author':res[1], 'price':res[3], 
                 'subject':res[4], 'description':description, 
                 'picture':res[6], 'id':res[7]}
                 cartItems.append(tmp)
     print(cartItems)
-    return render_template('checkout.html', loggedIn=loggedIn, cartItems=cartItems, deleteError=deleteError, deletedItem=deletedItem)    
+    session['total'] = total
+    return render_template('cart.html', loggedIn=loggedIn, cartItems=cartItems, deleteError=deleteError, deletedItem=deletedItem, total=total)    
     
 @app.route('/sell', methods=['GET', 'POST'])
 def sell():
@@ -281,13 +286,28 @@ def sell():
             conn.commit()
     return render_template('sell.html', loggedIn=loggedIn, listingSuccess=listingSuccess, listingFailure=listingFailure)
     
-@app.route('/product', methods=['GET', 'POST'])
-def product():
+@app.route('/pay', methods=['GET', 'POST'])
+def pay():
     loggedIn = False
+    itemcount = 0
+    complete = False
     if 'user' in session:
         currentUser = session['user']
         loggedIn = True
-    return render_template('product.html', loggedIn=loggedIn)
+        if 'total' in session:
+            subtotal = session['total']
+            tax = subtotal * 0.053
+            total = subtotal + tax + 3
+            subtotal = '%.2f' %  subtotal
+            tax = '%.2f' %  tax
+            total = '%.2f' %  total
+        if 'cart' in session:
+            cartItems = session['cart']
+            for item in cartItems:
+                itemcount += 1
+    if request.method=="POST":
+        complete = True
+    return render_template('checkout.html', loggedIn=loggedIn, subtotal=subtotal, itemcount = itemcount, tax=tax, total=total, complete=complete)
     
 @app.route('/about', methods=['GET', 'POST'])
 def aboutUs():

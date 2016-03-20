@@ -114,7 +114,7 @@
                     {% else %}
                     <td class="col-md-2">{{result.description}}</td>
                     {% endif %}
-                    <td class="col-md-1">{{result.price}}</td>
+                    <td class="col-md-1">${{result.price}}</td>
                     <td class="col-md-3"><img class="img-thumbnail img-responsive pictureurl" src={{result.picture}} /></td>
                     <td class="col-md-1">
                         &nbsp;&nbsp;<button type="button" class="btn btn-info" onClick="document.forms['toedit{{result.id}}'].submit();">Edit</button><br /><br />
