@@ -151,6 +151,41 @@
         </div>
     </div>
 </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class = "panel panel-default">
+                <div class = "panel-heading">
+                    <h3 class = "panel-title">
+                    Books Sold
+                    </h3>
+                </div>
+                <div class = "panel-body row">
+                 {% if soldBooks==[] %}
+                <div class="col-md-12">You have not sold any books.</div>
+                {% else %}
+                <table class="table-bordered col-md-12">
+                    {% for result in soldBooks %}
+                    <tr>
+                    <td class="col-md-1">{{result.date}}</div>
+                    <td class="col-md-1">{{result.isbn}}</td>
+                    <td class="col-md-2">{{result.title}}</td>
+                    <td class="col-md-2">{{result.author}}</td>
+                    <td class="col-md-1">{{result.subject}}</td>
+                    {% if result.description=="" %}
+                    <td class="col-md-2">No description</td>
+                    {% else %}
+                    <td class="col-md-2">{{result.description}}</td>
+                    {% endif %}
+                    <td class="col-md-1">${{result.price}}</td>
+                    <td class="col-md-3"><img class="img-thumbnail img-responsive pictureurl" src={{result.picture}} /></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
      <div class="row">
         <div class="col-md-12">
             <div class = "panel panel-default">
@@ -159,8 +194,29 @@
                     Past Orders
                     </h3>
                 </div>
-                <div class = "panel-body">
-                 You have no past orders.
+                <div class = "panel-body row">
+                {% if purchasedBooks==[] %}
+                <div class="col-md-12">You have no past orders.</div>
+                {% else %}
+                <table class="table-bordered col-md-12">
+                    {% for result in purchasedBooks %}
+                    <tr>
+                    <td class="col-md-1">{{result.date}}</td>
+                    <td class="col-md-1">{{result.isbn}}</td>
+                    <td class="col-md-2">{{result.title}}</td>
+                    <td class="col-md-2">{{result.author}}</td>
+                    <td class="col-md-1">{{result.subject}}</td>
+                    {% if result.description=="" %}
+                    <td class="col-md-2">No description</td>
+                    {% else %}
+                    <td class="col-md-2">{{result.description}}</td>
+                    {% endif %}
+                    <td class="col-md-1">${{result.price}}</td>
+                    <td class="col-md-3"><img class="img-thumbnail img-responsive pictureurl" src={{result.picture}} /></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% endif %}
                 </div>
             </div>
         </div>

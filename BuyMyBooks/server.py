@@ -370,6 +370,8 @@ def account():
     loggedIn = False
     accountInfo = ''
     listedBooks = []
+    purchasedBooks=[]
+    soldBooks=[]
     editFailure = False
     itemDeleted = False
     if 'user' in session:
@@ -437,6 +439,22 @@ def account():
                 accountInfo = {"email":result[0], 'firstname':result[1], 'lastname':result[2], 'school':result[3]}
                 
         q = "SELECT lb.isbn, STRING_AGG(a.name, ', '), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
+            lb.bookid, EXTRACT(EPOCH FROM sb.purchasedate) FROM listedbooks as lb JOIN soldbooks as sb ON lb.bookid = sb.bookid JOIN authortobook as atb ON \
+            sb.bookid=atb.bookid JOIN authors as a ON atb.authorid=a.authorid WHERE lb.sold IS true AND \
+            sb.userid = %s GROUP BY lb.bookid, sb.purchasedate ORDER BY sb.purchasedate DESC;"
+        query = cur.mogrify(q, (currentUser,))
+        print query
+        cur.execute(query)
+        results = cur.fetchall()
+        #print results
+        if results != []:
+            for result in results:
+                date = result[8]
+                date = datetime.datetime.fromtimestamp(date).strftime('%B %d, %Y')
+                purchasedBooks.append({"isbn":result[0], 'title':result[2], 'author':result[1], 'price':result[3], 
+                'subject':result[4], 'description':result[5], 'picture':result[6], 'id':result[7], 'date':date})
+                
+        q = "SELECT lb.isbn, STRING_AGG(a.name, ', '), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
             lb.bookid FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid INNER JOIN authors as a ON \
             atb.authorid=a.authorid WHERE lb.sold=False AND lb.userid = %s GROUP BY lb.bookid ORDER BY lb.bookid DESC;"
         query = cur.mogrify(q, (currentUser,))
@@ -449,8 +467,23 @@ def account():
                 listedBooks.append({"isbn":result[0], 'title':result[2], 'author':result[1], 'price':result[3], 
                 'subject':result[4], 'description':result[5], 'picture':result[6], 'id':result[7]})
         
+        q = "SELECT lb.isbn, STRING_AGG(a.name, ', '), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
+            lb.bookid, EXTRACT(EPOCH FROM sb.purchasedate) FROM listedbooks as lb JOIN soldbooks as sb ON lb.bookid = sb.bookid JOIN authortobook as atb ON \
+            sb.bookid=atb.bookid JOIN authors as a ON atb.authorid=a.authorid WHERE lb.sold IS true AND \
+            lb.userid = %s GROUP BY lb.bookid, sb.purchasedate ORDER BY sb.purchasedate DESC;"
+        query = cur.mogrify(q, (currentUser,))
+        print query
+        cur.execute(query)
+        results = cur.fetchall()
+        print results
+        if results != []:
+            for result in results:
+                date = result[8]
+                date = datetime.datetime.fromtimestamp(date).strftime('%B %d, %Y')
+                soldBooks.append({"isbn":result[0], 'title':result[2], 'author':result[1], 'price':result[3], 
+                'subject':result[4], 'description':result[5], 'picture':result[6], 'id':result[7], 'date':date})
     return render_template('account.html', loggedIn=loggedIn, accountInfo=accountInfo, listedBooks=listedBooks, 
-    itemDeleted=itemDeleted, editFailure=editFailure)
+    itemDeleted=itemDeleted, editFailure=editFailure, purchasedBooks=purchasedBooks, soldBooks=soldBooks)
     
 @app.route('/edititem', methods=['GET', 'POST'])
 def edit():
