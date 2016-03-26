@@ -11,7 +11,7 @@
       {% endif %}
 	       <div class="row">
 				<div class="col-md-6">
-					<form method="post">
+					<form method="post" onsubmit="return checkEmail()">
 						<div class="account-top heading">
 							<h3>REGISTERED CUSTOMERS</h3>
 						</div>
@@ -36,9 +36,27 @@
 					  	<a href="/forgotpassword"><u>Forgot password?</u></a>
 					  </div>
 				 </div>
+	<div id="validationfailed" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Invalid Input</h4>
+            </div>
+            <div class="modal-body">
+                <p id="errorinfo"></p>
+    </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 				<div class="clearfix"></div>
 			</div>
 	  </div>
 <!-- checkout -->
+<script>
+    $('#validationfailed').modal("hide");
+</script>
 
 {% endblock %}

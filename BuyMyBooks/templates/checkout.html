@@ -8,7 +8,7 @@
     <br />
 {% if loggedIn == true %}
     {% if complete == false %}
-    <form method="post">
+    <form method="post" onsubmit="return checkCardName() && checkCardNumber() && checkCVC() && checkMonth() && checkYear() && checkStreet() && checkCity() && checkState() && checkZip()">
     <div class="row">
         <div class="col-md-6">
             <div class="">
@@ -16,24 +16,24 @@
             </div><br /><br />
             <div class="">
     		    <h3>Name on Card</h3>
-                <input class='form-control' name='cardholdername' type='text' required>
+                <input class='form-control' name='cardholdername' id="cardholdername" type='text' required>
             </div><br /><br />
             <div class="">
     		    <h3>Card Number</h3>
-                <input class='form-control' name='cardnumber' type='text' required>
+                <input class='form-control' name='cardnumber' id="cardnumber" type='text' maxlength='16' required>
             </div><br /><br />
             <div class="row">
                 <div class="col-md-4">
                     <h3>CVC</h3>
-                    <input class='form-control' name='cvc' type='password' maxlength='3' required>
+                    <input class='form-control' name='cvc' id="cvc" type='password' maxlength='3' required>
                 </div>
     		    <div class="col-md-4">
                     <h3>Expiration</h3>
-                    <input class='form-control' name='expirationmonth' type='text' placeholder="MM" maxlength='2' required>
+                    <input class='form-control' name='expirationmonth' id='expirationmonth' type='text' placeholder="MM" maxlength='2' required>
                 </div>
                 <div class="col-md-4">
                     <h3>&nbsp;</h3>
-                    <input class='form-control' name='expirationyear' type='text' placeholder="YYYY" maxlength='4' required>
+                    <input class='form-control' name='expirationyear' id='expirationyear' type='text' placeholder="YYYY" maxlength='4' required>
                 </div>
             </div>
         </div>
@@ -43,20 +43,20 @@
             </div><br /><br />
              <div class="">
     		    <h3>Street</h3>
-                <input class='form-control' name='street' type='text' required>
+                <input class='form-control' name='street' id='street' type='text' required>
             </div><br /><br />
              <div class="row">
                  <div class="col-md-4">
         		    <h3>City</h3>
-                    <input class='form-control' name='city' type='text' required>
+                    <input class='form-control' name='city' id='city' type='text' required>
                 </div>
                 <div class="col-md-4">
         		    <h3>State</h3>
-                    <input class='form-control' name='state' type='text' required>
+                    <input class='form-control' name='state' id='state' type='text' maxlength='2' required>
                 </div>
                 <div class="col-md-4">
         		    <h3>Zip Code</h3>
-                    <input class='form-control' name='zipcode' type='text' required>
+                    <input class='form-control' name='zipcode' id='zipcode' type='text' maxlength='5' required>
                 </div>
             </div><br /><br />
             <div class="col-md-1"></div>
@@ -172,7 +172,27 @@
 {% endif %}
     </div>
     <br /><br /><br />
+    <div id="validationfailed" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Invalid Input</h4>
+            </div>
+            <div class="modal-body">
+                <p id="errorinfo"></p>
+    </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+
 
 </div>
+<script>
+    $('#validationfailed').modal("hide");
+</script>
       <!--//checkout-->
 {% endblock %}
+

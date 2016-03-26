@@ -270,22 +270,23 @@ def sell():
                         for result in results:
                             primaryauthorids.append(result[0]) 
                     print(primaryauthorids)
-                secondaryauthors = [x.strip() for x in request.form['secondaryauthor'].split(',')]
-                print(secondaryauthors)
-                for a in secondaryauthors:
-                    a = remove_accents(a)
-                    query = cur.mogrify("INSERT INTO authors (name) VALUES (%s);", (a,))
-                    print cur.mogrify(query)
-                    cur.execute(query)
-                    query = cur.mogrify("SELECT authorid FROM authors ORDER BY authorid DESC LIMIT 1;")
-                    print query
-                    cur.execute(query)
-                    results = cur.fetchall()
-                    print results
-                    if results != []:
-                        for result in results:
-                            secondaryauthorids.append(result[0]) 
-                    print(secondaryauthorids)
+                if request.form.get['secondaryauthor']:
+                    secondaryauthors = [x.strip() for x in request.form['secondaryauthor'].split(',')]
+                    print(secondaryauthors)
+                    for a in secondaryauthors:
+                        a = remove_accents(a)
+                        query = cur.mogrify("INSERT INTO authors (name) VALUES (%s);", (a,))
+                        print cur.mogrify(query)
+                        cur.execute(query)
+                        query = cur.mogrify("SELECT authorid FROM authors ORDER BY authorid DESC LIMIT 1;")
+                        print query
+                        cur.execute(query)
+                        results = cur.fetchall()
+                        print results
+                        if results != []:
+                            for result in results:
+                                secondaryauthorids.append(result[0]) 
+                        print(secondaryauthorids)
                 title = remove_accents(request.form['title'])
                 query = cur.mogrify("""INSERT INTO listedbooks (isbn, title, price, subject, description, pictureurl, userid) VALUES (%s, %s, %s, %s, %s, %s, %s);""", 
                     (request.form['isbn'], title, request.form['price'], request.form['subject'], description, pictureurl, currentUser))
@@ -318,6 +319,7 @@ def sell():
     
 @app.route('/pay', methods=['GET', 'POST'])
 def pay():
+
     loggedIn = False
     itemcount = 0
     complete = False
@@ -328,6 +330,7 @@ def pay():
     total = 0
     date = ''
     purchasedItems=[]
+    
     if 'user' in session:
         currentUser = session['user']
         loggedIn = True
@@ -340,47 +343,47 @@ def pay():
             cur = conn.cursor()
             currentTime = time.time()
             date = datetime.datetime.fromtimestamp(currentTime).strftime('%Y-%m-%d %H:%M:%S')
-            try:
-                for item in cartItems:
-                    query = cur.mogrify("""INSERT INTO soldbooks (bookid, userid, purchasedate) VALUES (%s, %s, %s);""", (item, 
-                        currentUser, date))
-                    print(query)
-                    cur.execute(query)
-                    query = cur.mogrify("""UPDATE listedbooks SET sold='true' WHERE bookid=%s;""", (item,))
-                    print(query)
-                    cur.execute(query)
-                    query = cur.mogrify("""DELETE FROM cart WHERE bookid=%s;""", (item,))
-                    print query
-                    cur.execute(query)
-                    query = cur.mogrify("SELECT lb.isbn, STRING_AGG(a.name, ', ' ORDER BY atb.priority), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
-                    lb.bookid FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid INNER JOIN authors as a ON atb.authorid=a.authorid \
-                    WHERE lb.bookid=%s GROUP BY lb.bookid;""", (item,))
-                    print query
-                    cur.execute(query)
-                    result = cur.fetchall()
-                    for res in result:
-                        if res[5] != "":
-                            description = res[5]
-                        else:
-                            description = "No description available"
-                        tmp = {'isbn':res[0], 'title':res[2], 'author':res[1], 'price':res[3], 
-                            'subject':res[4], 'description':description, 
-                            'picture':res[6], 'id':res[7]}
-                        purchasedItems.append(tmp)
-                print(purchasedItems)
-                complete = True
-            except:
-                print "Error completing purchase"
-                conn.rollback()
-            conn.commit()
-            date = datetime.datetime.fromtimestamp(currentTime).strftime('%B %d, %Y')
+            # try:
+            #     for item in cartItems:
+            #         query = cur.mogrify("""INSERT INTO soldbooks (bookid, userid, purchasedate) VALUES (%s, %s, %s);""", (item, 
+            #             currentUser, date))
+            #         print(query)
+            #         cur.execute(query)
+            #         query = cur.mogrify("""UPDATE listedbooks SET sold='true' WHERE bookid=%s;""", (item,))
+            #         print(query)
+            #         cur.execute(query)
+            #         query = cur.mogrify("""DELETE FROM cart WHERE bookid=%s;""", (item,))
+            #         print query
+            #         cur.execute(query)
+            #         query = cur.mogrify("""SELECT lb.isbn, STRING_AGG(a.name, ', ' ORDER BY atb.priority), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
+            #         lb.bookid FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid INNER JOIN authors as a ON atb.authorid=a.authorid \
+            #         WHERE lb.bookid=%s GROUP BY lb.bookid;""", (item,))
+            #         print query
+            #         cur.execute(query)
+            #         result = cur.fetchall()
+            #         for res in result:
+            #             if res[5] != "":
+            #                 description = res[5]
+            #             else:
+            #                 description = "No description available"
+            #             tmp = {'isbn':res[0], 'title':res[2], 'author':res[1], 'price':res[3], 
+            #                 'subject':res[4], 'description':description, 
+            #                 'picture':res[6], 'id':res[7]}
+            #             purchasedItems.append(tmp)
+            #     print(purchasedItems)
+            #     complete = True
+            # except:
+            #     print "Error completing purchase"
+            #     conn.rollback()
+            # conn.commit()
+            # date = datetime.datetime.fromtimestamp(currentTime).strftime('%B %d, %Y')
         subtotal = float(subtotal)
         tax = subtotal * 0.053
         total = subtotal + tax + 5
         subtotal = '%.2f' %  subtotal
         tax = '%.2f' %  tax
         total = '%.2f' %  total
-            
+    
     return render_template('checkout.html', loggedIn=loggedIn, subtotal=subtotal, itemcount = itemcount, 
     tax=tax, total=total, complete=complete, purchasedItems=purchasedItems, date=date)
     

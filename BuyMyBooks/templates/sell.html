@@ -26,12 +26,12 @@
 			<h3 class="tittle con">Start Selling</h3>
 				<div class="contact-form row">
 					<div class="col-md-6">
-				  	  <form role="form" method="post">
+				  	  <form role="form" method="post" onsubmit="return checkISBN() && checkTitle() && checkPrice() && checkPrimaryAuthor() && checkSecondaryAuthor()">
 		  	        	<p class="comment-form-author form-group"><label>Title:</label>
-			    	    	<input type="text" name="title" class="textbox form-control" required>
+			    	    	<input type="text" name="title" id="title" class="textbox form-control" required>
 				    	</p>
 				    	<p class="comment-form-author form-group"><label>Primary Author(s): <sub>(Separate multiple authors with commas)</sub></label>
-			    	    	<input type="text" name = "primaryauthor" class="textbox form-control" required>
+			    	    	<input type="text" name = "primaryauthor" id="primaryauthor" class="textbox form-control" required>
 				    	</p>
 				    	<p class="comment-form-author form-group"><label>Description: (optional)</label>
 				    	  <textarea name="description" id="description"></textarea>
@@ -40,13 +40,13 @@
 				    	
 				    <div class="col-md-6">
 				        <p class="comment-form-author form-group"><label>ISBN:</label>
-				     	   <input type="text" name="isbn" class="textbox form-control" required>
+				     	   <input type="text" name="isbn" id="isbn" class="textbox form-control" required>
 				        </p>
 				        <p class="comment-form-author form-group"><label>Secondary Author(s): <sub>(Separate multiple authors with commas)</sub></label>
-			    	    	<input type="text" name = "secondaryauthor" class="textbox form-control">
+			    	    	<input type="text" name = "secondaryauthor" id="secondaryauthor" class="textbox form-control">
 				    	</p>
 				        <p class="comment-form-author form-group"><label>Price:</label>
-				     	   <input type="text" name="price" class="textbox form-control" required>
+				     	   <input type="text" name="price" id="price" class="textbox form-control" required>
 				        </p>
 				        <p class="comment-form-author form-group"><label>Subject:</label>
 						<select class="form-control" id="subject" name="subject" size="4">
@@ -80,7 +80,7 @@
 				<div class="contact-form row">
 					<div class="col-md-12">
 						<p class="comment-form-author form-group"><label>Picture URL:</label>
-				     	   <input type="text" name="url" class="textbox form-control">
+				     	   <input type="text" name="url" id="url" class="textbox form-control">
 				        </p>
 					</div>
 				</div>
@@ -88,7 +88,27 @@
 					</form>
 		        </div>
 		        <div class="clearfix"></div>
+	<div id="validationfailed" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Invalid Input</h4>
+            </div>
+            <div class="modal-body">
+                <p id="errorinfo"></p>
+    </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 		{% endif %}	
   </div>
+  
+<script>
+    $('#validationfailed').modal("hide");
+</script>
+
  <!--//checkout-->
  {% endblock %}
