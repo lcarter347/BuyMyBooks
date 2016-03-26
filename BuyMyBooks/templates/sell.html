@@ -30,11 +30,11 @@
 		  	        	<p class="comment-form-author form-group"><label>Title:</label>
 			    	    	<input type="text" name="title" class="textbox form-control" required>
 				    	</p>
-			    	    <p class="comment-form-author form-group"><label>Author: <sub>(Separate multiple authors with commas)</sub></label>
-			    	    	<input type="text" name = "author" class="textbox form-control" required>
+				    	<p class="comment-form-author form-group"><label>Primary Author(s): <sub>(Separate multiple authors with commas)</sub></label>
+			    	    	<input type="text" name = "primaryauthor" class="textbox form-control" required>
 				    	</p>
 				    	<p class="comment-form-author form-group"><label>Description: (optional)</label>
-				    	  <textarea name="description"></textarea>
+				    	  <textarea name="description" id="description"></textarea>
 				        </p>
 				    </div>
 				    	
@@ -42,11 +42,14 @@
 				        <p class="comment-form-author form-group"><label>ISBN:</label>
 				     	   <input type="text" name="isbn" class="textbox form-control" required>
 				        </p>
+				        <p class="comment-form-author form-group"><label>Secondary Author(s): <sub>(Separate multiple authors with commas)</sub></label>
+			    	    	<input type="text" name = "secondaryauthor" class="textbox form-control">
+				    	</p>
 				        <p class="comment-form-author form-group"><label>Price:</label>
 				     	   <input type="text" name="price" class="textbox form-control" required>
 				        </p>
 				        <p class="comment-form-author form-group"><label>Subject:</label>
-						<select class="form-control" id="subject" name="subject" size="7">
+						<select class="form-control" id="subject" name="subject" size="4">
 							<option>Anthropology</option>
 							<option>Art</option>
 							<option>Biology</option>

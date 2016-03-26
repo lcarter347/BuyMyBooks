@@ -5,6 +5,15 @@ License: Creative Commons Attribution 3.0 Unported
 License URL: http://creativecommons.org/licenses/by/3.0/
 --*/
 
+#description{
+	height:28vh;
+}
+.textscroll{
+	height: 120px;
+	overflow: scroll;
+}
+	
+}
 .checkoutbtn{
 	background-color: #18C9D2;
 }

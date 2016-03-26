@@ -62,8 +62,14 @@
                     Email
                     </h3>
                 </div>
-                <div class = "panel-body">
-                 {{accountInfo['email']}}
+                <div class = "panel-body row">
+                    <div class="col-md-10">
+                         {{accountInfo['email']}}
+                    </div>
+                    <div class="col-md-8"></div>
+                    <div class="col-md-4">
+                        <a href="/resetpassword" class="btn btn-info" role="button">Reset Password</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -105,16 +111,16 @@
                 <table class="table-bordered col-md-12">
                     {% for result in listedBooks %}
                     <tr>
-                    <td class="col-md-1">{{result.isbn}}</td>
-                    <td class="col-md-2">{{result.title}}</td>
-                    <td class="col-md-2">{{result.author}}</td>
-                    <td class="col-md-1">{{result.subject}}</td>
+                    <td class="col-md-1"><div class="textscroll">{{result.isbn}}</div></td>
+                    <td class="col-md-2"><div class="textscroll">{{result.title}}</div></td>
+                    <td class="col-md-2"><div class="textscroll">{{result.author}}</div></td>
+                    <td class="col-md-1"><div class="textscroll">{{result.subject}}</div></td>
                     {% if result.description=="" %}
-                    <td class="col-md-2">No description</td>
+                    <td class="col-md-2"><div class="textscroll">No description</div></td>
                     {% else %}
-                    <td class="col-md-2">{{result.description}}</td>
+                    <td class="col-md-2"><div class="textscroll">{{result.description}}</div></td>
                     {% endif %}
-                    <td class="col-md-1">${{result.price}}</td>
+                    <td class="col-md-1"><div class="textscroll">${{result.price}}</div></td>
                     <td class="col-md-3"><img class="img-thumbnail img-responsive pictureurl" src={{result.picture}} /></td>
                     <td class="col-md-1">
                         &nbsp;&nbsp;<button type="button" class="btn btn-info" onClick="document.forms['toedit{{result.id}}'].submit();">Edit</button><br /><br />
@@ -166,17 +172,17 @@
                 <table class="table-bordered col-md-12">
                     {% for result in soldBooks %}
                     <tr>
-                    <td class="col-md-1">{{result.date}}</div>
-                    <td class="col-md-1">{{result.isbn}}</td>
-                    <td class="col-md-2">{{result.title}}</td>
-                    <td class="col-md-2">{{result.author}}</td>
-                    <td class="col-md-1">{{result.subject}}</td>
+                    <td class="col-md-1"><div class="textscroll">{{result.date}}</div></td>
+                    <td class="col-md-1"><div class="textscroll">{{result.isbn}}</div></td>
+                    <td class="col-md-2"><div class="textscroll">{{result.title}}</div></td>
+                    <td class="col-md-2"><div class="textscroll">{{result.author}}</div></td>
+                    <td class="col-md-1"><div class="textscroll">{{result.subject}}</div></td>
                     {% if result.description=="" %}
-                    <td class="col-md-2">No description</td>
+                    <td class="col-md-2"><div class="textscroll">No description</div></td>
                     {% else %}
-                    <td class="col-md-2">{{result.description}}</td>
+                    <td class="col-md-2"><div class="textscroll">{{result.description}}</div></td>
                     {% endif %}
-                    <td class="col-md-1">${{result.price}}</td>
+                    <td class="col-md-1"><div class="textscroll">${{result.price}}</div></td>
                     <td class="col-md-3"><img class="img-thumbnail img-responsive pictureurl" src={{result.picture}} /></td>
                     </tr>
                     {% endfor %}
@@ -201,17 +207,17 @@
                 <table class="table-bordered col-md-12">
                     {% for result in purchasedBooks %}
                     <tr>
-                    <td class="col-md-1">{{result.date}}</td>
-                    <td class="col-md-1">{{result.isbn}}</td>
-                    <td class="col-md-2">{{result.title}}</td>
-                    <td class="col-md-2">{{result.author}}</td>
-                    <td class="col-md-1">{{result.subject}}</td>
+                    <td class="col-md-1"><div class="textscroll">{{result.date}}</div></td>
+                    <td class="col-md-1"><div class="textscroll">{{result.isbn}}</div></td>
+                    <td class="col-md-2"><div class="textscroll">{{result.title}}</div></td>
+                    <td class="col-md-2"><div class="textscroll">{{result.author}}</div></td>
+                    <td class="col-md-1"><div class="textscroll">{{result.subject}}</div></td>
                     {% if result.description=="" %}
-                    <td class="col-md-2">No description</td>
+                    <td class="col-md-2"><div class="textscroll">No description</div></td>
                     {% else %}
-                    <td class="col-md-2">{{result.description}}</td>
+                    <td class="col-md-2"><div class="textscroll">{{result.description}}</div></td>
                     {% endif %}
-                    <td class="col-md-1">${{result.price}}</td>
+                    <td class="col-md-1"><div class="textscroll">${{result.price}}</div></td>
                     <td class="col-md-3"><img class="img-thumbnail img-responsive pictureurl" src={{result.picture}} /></td>
                     </tr>
                     {% endfor %}

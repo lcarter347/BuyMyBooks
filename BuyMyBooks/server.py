@@ -1,4 +1,5 @@
 import os
+import sys
 import psycopg2
 import psycopg2.extras
 from flask import Flask, session, render_template, request, redirect, url_for, make_response
@@ -6,6 +7,11 @@ from flask.ext.socketio import SocketIO, emit
 import unicodedata
 import time
 import datetime
+import smtplib
+from email.mime.text import MIMEText
+import string
+import random
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -34,13 +40,13 @@ def search(txt, subjectfilter, sortfilter):
     txt2 = txt
     txt = '%' + txt + '%'
     if (subjectfilter=="all"):
-        q = "SELECT lb.isbn, STRING_AGG(a.name, ', '), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
-            lb.bookid FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid \
-            INNER JOIN authors as a ON atb.authorid=a.authorid WHERE lb.sold IS false AND (LOWER(lb.title) LIKE %s OR LOWER(a.name) LIKE %s \
-            OR lb.isbn =%s) GROUP BY lb.bookid " + sortfilter + ";"
+        q = "SELECT lb.isbn, STRING_AGG(a.name, ', ' ORDER BY atb.priority), lb.title, \
+            lb.price, lb.subject, lb.description, lb.pictureurl, lb.bookid FROM listedbooks as lb JOIN authortobook \
+            as atb ON lb.bookid=atb.bookid JOIN authors as a ON atb.authorid=a.authorid WHERE lb.sold IS false AND \
+            (LOWER(lb.title) LIKE %s OR LOWER(a.name) LIKE %s OR lb.isbn =%s) GROUP BY lb.bookid " + sortfilter + ";"
         query = cur.mogrify(q, (txt, txt, txt2))
     else:
-        q = "SELECT lb.isbn, STRING_AGG(a.name, ', '), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
+        q = "SELECT lb.isbn, STRING_AGG(a.name, ', ' ORDER BY atb.priority), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
             lb.bookid FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid INNER JOIN authors as a ON \
             atb.authorid=a.authorid WHERE (lb.subject IN (" + subjectfilter + ") AND lb.sold IS false) AND (LOWER(lb.title) \
             LIKE %s OR LOWER(a.name) LIKE %s OR lb.isbn=%s) GROUP BY lb.bookid " + sortfilter + ";"
@@ -205,7 +211,7 @@ def checkout():
             session['cart'] = cartIds
         print(cartIds)
         for i in cartIds:
-            query = cur.mogrify("SELECT lb.isbn, STRING_AGG(a.name, ', '), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
+            query = cur.mogrify("SELECT lb.isbn, STRING_AGG(a.name, ', ' ORDER BY atb.priority), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
                 lb.bookid FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid INNER JOIN authors as a ON atb.authorid=a.authorid \
                 WHERE lb.bookid=%s GROUP BY lb.bookid;""", (i,))
             print query
@@ -240,16 +246,17 @@ def sell():
             conn = connectToDB()
             cur = conn.cursor()
             bookid = 0
-            authorids = []
+            primaryauthorids = []
+            secondaryauthorids = []
             authors = []
             try:
                 if request.form.get('description'):
                     description = remove_accents(request.form['description'])
                 if request.form.get('url'):
                     pictureurl = request.form['url']
-                authors = [x.strip() for x in request.form['author'].split(',')]
-                print(authors)
-                for a in authors:
+                primaryauthors = [x.strip() for x in request.form['primaryauthor'].split(',')]
+                print(primaryauthors)
+                for a in primaryauthors:
                     a = remove_accents(a)
                     query = cur.mogrify("INSERT INTO authors (name) VALUES (%s);", (a,))
                     print cur.mogrify(query)
@@ -261,13 +268,28 @@ def sell():
                     print results
                     if results != []:
                         for result in results:
-                            authorids.append(result[0]) 
-                    print(authorids)
+                            primaryauthorids.append(result[0]) 
+                    print(primaryauthorids)
+                secondaryauthors = [x.strip() for x in request.form['secondaryauthor'].split(',')]
+                print(secondaryauthors)
+                for a in secondaryauthors:
+                    a = remove_accents(a)
+                    query = cur.mogrify("INSERT INTO authors (name) VALUES (%s);", (a,))
+                    print cur.mogrify(query)
+                    cur.execute(query)
+                    query = cur.mogrify("SELECT authorid FROM authors ORDER BY authorid DESC LIMIT 1;")
+                    print query
+                    cur.execute(query)
+                    results = cur.fetchall()
+                    print results
+                    if results != []:
+                        for result in results:
+                            secondaryauthorids.append(result[0]) 
+                    print(secondaryauthorids)
                 title = remove_accents(request.form['title'])
-                q = "INSERT INTO listedbooks (isbn, title, price, subject, description, pictureurl, userid) VALUES (%s, %s, %s, %s, %s, %s, %s);"
-                query = cur.mogrify(q, (request.form['isbn'], title, request.form['price'], 
-                    request.form['subject'], description, pictureurl, currentUser))
-                print(query)
+                query = cur.mogrify("""INSERT INTO listedbooks (isbn, title, price, subject, description, pictureurl, userid) VALUES (%s, %s, %s, %s, %s, %s, %s);""", 
+                    (request.form['isbn'], title, request.form['price'], request.form['subject'], description, pictureurl, currentUser))
+                print query
                 cur.execute(query)
                 query = cur.mogrify("SELECT bookid FROM listedbooks ORDER BY bookid DESC LIMIT 1;")
                 cur.execute(query)
@@ -276,9 +298,14 @@ def sell():
                 if results != []:
                     for result in results:
                         bookid = result[0]
-                for id in authorids:
-                    q = "INSERT INTO authortobook (authorid, bookid) VALUES (%s, %s);"
-                    query = cur.mogrify(q, (id, bookid))
+                for i in primaryauthorids:
+                    q = "INSERT INTO authortobook (authorid, bookid, priority) VALUES (%s, %s, 1);"
+                    query = cur.mogrify(q, (i, bookid))
+                    print cur.mogrify(query)
+                    cur.execute(query)
+                for i in secondaryauthorids:
+                    q = "INSERT INTO authortobook (authorid, bookid, priority) VALUES (%s, %s, 2);"
+                    query = cur.mogrify(q, (i, bookid))
                     print cur.mogrify(query)
                     cur.execute(query)
                 listingSuccess = True
@@ -325,7 +352,7 @@ def pay():
                     query = cur.mogrify("""DELETE FROM cart WHERE bookid=%s;""", (item,))
                     print query
                     cur.execute(query)
-                    query = cur.mogrify("SELECT lb.isbn, STRING_AGG(a.name, ', '), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
+                    query = cur.mogrify("SELECT lb.isbn, STRING_AGG(a.name, ', ' ORDER BY atb.priority), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
                     lb.bookid FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid INNER JOIN authors as a ON atb.authorid=a.authorid \
                     WHERE lb.bookid=%s GROUP BY lb.bookid;""", (item,))
                     print query
@@ -438,7 +465,7 @@ def account():
             for result in results:
                 accountInfo = {"email":result[0], 'firstname':result[1], 'lastname':result[2], 'school':result[3]}
                 
-        q = "SELECT lb.isbn, STRING_AGG(a.name, ', '), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
+        q = "SELECT lb.isbn, STRING_AGG(a.name, ', ' ORDER BY atb.priority), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
             lb.bookid, EXTRACT(EPOCH FROM sb.purchasedate) FROM listedbooks as lb JOIN soldbooks as sb ON lb.bookid = sb.bookid JOIN authortobook as atb ON \
             sb.bookid=atb.bookid JOIN authors as a ON atb.authorid=a.authorid WHERE lb.sold IS true AND \
             sb.userid = %s GROUP BY lb.bookid, sb.purchasedate ORDER BY sb.purchasedate DESC;"
@@ -454,7 +481,7 @@ def account():
                 purchasedBooks.append({"isbn":result[0], 'title':result[2], 'author':result[1], 'price':result[3], 
                 'subject':result[4], 'description':result[5], 'picture':result[6], 'id':result[7], 'date':date})
                 
-        q = "SELECT lb.isbn, STRING_AGG(a.name, ', '), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
+        q = "SELECT lb.isbn, STRING_AGG(a.name, ', ' ORDER BY atb.priority), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
             lb.bookid FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid INNER JOIN authors as a ON \
             atb.authorid=a.authorid WHERE lb.sold=False AND lb.userid = %s GROUP BY lb.bookid ORDER BY lb.bookid DESC;"
         query = cur.mogrify(q, (currentUser,))
@@ -467,7 +494,7 @@ def account():
                 listedBooks.append({"isbn":result[0], 'title':result[2], 'author':result[1], 'price':result[3], 
                 'subject':result[4], 'description':result[5], 'picture':result[6], 'id':result[7]})
         
-        q = "SELECT lb.isbn, STRING_AGG(a.name, ', '), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
+        q = "SELECT lb.isbn, STRING_AGG(a.name, ', ' ORDER BY atb.priority), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
             lb.bookid, EXTRACT(EPOCH FROM sb.purchasedate) FROM listedbooks as lb JOIN soldbooks as sb ON lb.bookid = sb.bookid JOIN authortobook as atb ON \
             sb.bookid=atb.bookid JOIN authors as a ON atb.authorid=a.authorid WHERE lb.sold IS true AND \
             lb.userid = %s GROUP BY lb.bookid, sb.purchasedate ORDER BY sb.purchasedate DESC;"
@@ -497,7 +524,7 @@ def edit():
         cur = conn.cursor()
         if request.form.get("itemtoedit"):
             try:
-                query = cur.mogrify("""SELECT lb.isbn, STRING_AGG(a.name, ', '), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl \
+                query = cur.mogrify("""SELECT lb.isbn, STRING_AGG(a.name, ', ' ORDER BY atb.priority), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl \
                 FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid INNER JOIN authors as a ON atb.authorid=a.authorid \
                 WHERE lb.bookid=%s GROUP BY lb.bookid;""", (request.form['itemtoedit'],))
                 print(query)
@@ -514,6 +541,99 @@ def edit():
                 editFailure = True
     return render_template('edititem.html', loggedIn=loggedIn, item=item)
 
+@app.route('/forgotpassword', methods=['GET', 'POST'])
+def forgotPassword():
+    loggedIn = False
+    passChanged = False
+    passFailed = False
+    wrongUsername = False
+    if request.method=="POST":
+        receiver=[request.form['email']]
+        sender = ['buymybooks350@gmail.com']
+        
+        chars = string.ascii_uppercase + string.ascii_lowercase + string.digits
+        randomPass = ''.join(random.choice(chars) for _ in range(8))
+        print randomPass
+        
+        emailMSG = "Your new password is:  " + randomPass + "\n\nThank you, \nBuyMyBooks"
+        msg = MIMEText(emailMSG)
+        msg['Subject'] = 'Reset password'
+        msg['From'] = 'buymybooks350@gmail.com'
+        msg['To'] = request.form['email']
+        
+        conn = connectToDB()
+        cur = conn.cursor()
+        
+        query = cur.mogrify("""SELECT * FROM users WHERE email = %s;""", (request.form['email'],))
+        print query
+        cur.execute(query)
+        results = cur.fetchall()
+        print results
+        if results != []:
+            try:
+                query = cur.mogrify("""UPDATE users SET password=crypt(%s, gen_salt('bf')) WHERE email = %s;""", (randomPass, request.form['email'])) 
+                print query
+                cur.execute(query)
+                conn.commit()
+                passChanged = True
+                print "Password changed"
+                try:
+                    smtpObj = smtplib.SMTP("smtp.gmail.com", 587)
+                    #server.set_debuglevel(1)
+                    smtpObj.ehlo()
+                    smtpObj.starttls()
+                    smtpObj.login('buymybooks350@gmail.com', 'zacharski350')
+                    smtpObj.sendmail(sender, receiver, msg.as_string())         
+                    print "Successfully sent email"
+                except Exception as e:
+                    print(e)
+            except:
+                print("Error changing password")
+                conn.rollback()
+                passFailed = True
+        else:
+            wrongUsername = True
+            print "Incorrect email"
+    return render_template('forgotpassword.html', loggedIn=loggedIn, passChanged=passChanged, passFailed=passFailed,
+    wrongUsername=wrongUsername)
+
+@app.route('/resetpassword', methods=['GET', 'POST'])
+def resetPassword():
+    loggedIn = False
+    passChanged = False
+    passFailed = False
+    wrongPass = False
+    if 'user' in session:
+        currentUser = session['user']
+        loggedIn = True
+    if request.method=="POST":
+        oldpass = request.form['oldpassword']
+        newpass = request.form['password1']
+        conn = connectToDB()
+        cur = conn.cursor()
+        query = cur.mogrify("""SELECT * FROM users WHERE email = %s AND password = crypt(%s, password);""", (currentUser, oldpass)) 
+        print(query)
+        cur.execute(query)
+        results = cur.fetchall()
+        print results
+        if results != []:
+            try:
+                query = cur.mogrify("""UPDATE users SET password=crypt(%s, gen_salt('bf')) WHERE email = %s;""", (newpass, currentUser)) 
+                print query
+                cur.execute(query)
+                conn.commit()
+                passChanged = True
+                print "Password changed"
+            except:
+                print("Error changing password")
+                conn.rollback()
+                passFailed = True
+        else:
+            wrongPass = True
+            print "Incorrect password"
+    return render_template('resetpassword.html', loggedIn=loggedIn, passChanged=passChanged, passFailed=passFailed, 
+    wrongPass=wrongPass)
+    
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     loggedIn = False
