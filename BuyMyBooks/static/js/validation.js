@@ -247,6 +247,18 @@ function checkYear(){
     }
 }
 
+function checkDate(){
+	var month = Number(document.getElementById("expirationmonth").value);
+	var year = Number(document.getElementById("expirationyear").value);
+	if (year==2016 && month < 3){
+		document.getElementById("errorinfo").innerHTML = "This card has expired. &nbsp; Please enter a non-expired card.";
+		$('#validationfailed').modal();
+		return false;
+	} else {
+		return true;
+	}
+}
+
 function checkStreet(){
 	var streetpat = /(^[0-9A-Za-z\.\-\'\s]+$)/;
 	var street = document.getElementById("street");
