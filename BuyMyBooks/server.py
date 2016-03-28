@@ -47,13 +47,13 @@ def search(txt, subjectfilter, sortfilter):
         q = "SELECT lb.isbn, STRING_AGG(a.name, ', ' ORDER BY atb.priority), lb.title, \
             lb.price, lb.subject, lb.description, lb.pictureurl, lb.bookid FROM listedbooks as lb JOIN authortobook \
             as atb ON lb.bookid=atb.bookid JOIN authors as a ON atb.authorid=a.authorid WHERE lb.sold IS false AND \
-            (LOWER(lb.title) LIKE %s OR LOWER(a.name) LIKE %s OR lb.isbn =%s) GROUP BY lb.bookid " + sortfilter + ";"
+            (LOWER(lb.title) LIKE %s OR LOWER(a.name) LIKE %s OR LOWER(lb.isbn) =%s) GROUP BY lb.bookid " + sortfilter + ";"
         query = cur.mogrify(q, (txt, txt, txt2))
     else:
         q = "SELECT lb.isbn, STRING_AGG(a.name, ', ' ORDER BY atb.priority), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
             lb.bookid FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid INNER JOIN authors as a ON \
             atb.authorid=a.authorid WHERE (lb.subject IN (" + subjectfilter + ") AND lb.sold IS false) AND (LOWER(lb.title) \
-            LIKE %s OR LOWER(a.name) LIKE %s OR lb.isbn=%s) GROUP BY lb.bookid " + sortfilter + ";"
+            LIKE %s OR LOWER(a.name) LIKE %s OR LOWER(lb.isbn)=%s) GROUP BY lb.bookid " + sortfilter + ";"
         query = cur.mogrify(q, (txt, txt, txt))
     
     print query
@@ -401,9 +401,9 @@ def pay():
                             'subject':res[4], 'description':description, 
                             'picture':res[6], 'id':res[7]}
                         purchasedItems.append(tmp)
-                    purchaseStr += "<table border='1'><tr><td>" + tmp['title'] + "</td><td>" + tmp['author'] + "</td><td>" + tmp['isbn'] + "</td><td>" + str(tmp['price']) + "</td></tr><tr><td colspan='4'>" + tmp['description'] + "</td></tr></table><br />"
+                    purchaseStr += "<table border='1'><tr><td>" + tmp['title'] + "</td><td>" + tmp['author'] + "</td><td>" + tmp['isbn'] + "</td><td>$" + str(tmp['price']) + "</td></tr><tr><td colspan='4'>" + tmp['description'] + "</td></tr></table><br />"
                 print(purchasedItems)
-                purchaseStr += "<br /><br />"
+                purchaseStr += "<br />"
                 print(purchaseStr)
                 date = datetime.datetime.fromtimestamp(currentTime).strftime('%B %d, %Y')
                 
@@ -412,10 +412,11 @@ def pay():
                 
                 receipt = "<p>Here is your receipt:</p><br />" + date + "<br /><br />"
                 receipt += purchaseStr
-                receipt += "<table border='1'><tr><td>Subtotal: " + subtotal + "</td></tr>"
-                receipt += "<tr><td>Tax: " + tax + "</td></tr>"
-                receipt += "<tr><td>Shipping: $5.00</td></tr>"
-                receipt += "<tr><td>Total: " + total + "</td></tr></table>"
+                receipt +="Items: " + str(itemcount) + "<br />"
+                receipt += "Subtotal: $" + subtotal + "<br />"
+                receipt += "Tax: $" + tax + "<br />"
+                receipt += "Shipping: $5.00<br />"
+                receipt += "<strong>Total: $" + total + "</strong><br />"
                 print(receipt)
                 receipt += "<br /><br />Thank you, <br />BuyMyBooks"
                 

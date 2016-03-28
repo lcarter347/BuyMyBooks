@@ -27,6 +27,7 @@ BuyMyBooksApp.controller('SearchController', function($scope, $window){
         console.log("Search for: ", $scope.searchtext);
         var subjectfilter = subjects();
         var sortfilter = sort();
+        $scope.noresults = false;
         socket.emit('search', $scope.searchtext, subjectfilter, sortfilter);
     }
     
