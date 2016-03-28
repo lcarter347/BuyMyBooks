@@ -10,6 +10,7 @@ import time
 import datetime
 import smtplib
 from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 import string
 import random
 import re
@@ -353,6 +354,7 @@ def pay():
     total = 0
     date = ''
     purchasedItems=[]
+    purchaseStr = ""
     
     if 'user' in session:
         currentUser = session['user']
@@ -361,52 +363,85 @@ def pay():
             cartItems = session['cart']
             for item in cartItems:
                 itemcount += 1
-        # if request.method=="POST":
-        #     conn = connectToDB()
-        #     cur = conn.cursor()
-        #     currentTime = time.time()
-        #     date = datetime.datetime.fromtimestamp(currentTime).strftime('%Y-%m-%d %H:%M:%S')
-        #     try:
-        #         for item in cartItems:
-        #             query = cur.mogrify("""INSERT INTO soldbooks (bookid, userid, purchasedate) VALUES (%s, %s, %s);""", (item, 
-        #                 currentUser, date))
-        #             print(query)
-        #             cur.execute(query)
-        #             query = cur.mogrify("""UPDATE listedbooks SET sold='true' WHERE bookid=%s;""", (item,))
-        #             print(query)
-        #             cur.execute(query)
-        #             query = cur.mogrify("""DELETE FROM cart WHERE bookid=%s;""", (item,))
-        #             print query
-        #             cur.execute(query)
-        #             query = cur.mogrify("""SELECT lb.isbn, STRING_AGG(a.name, ', ' ORDER BY atb.priority), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
-        #             lb.bookid FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid INNER JOIN authors as a ON atb.authorid=a.authorid \
-        #             WHERE lb.bookid=%s GROUP BY lb.bookid;""", (item,))
-        #             print query
-        #             cur.execute(query)
-        #             result = cur.fetchall()
-        #             for res in result:
-        #                 if res[5] != "":
-        #                     description = res[5]
-        #                 else:
-        #                     description = "No description available"
-        #                 tmp = {'isbn':res[0], 'title':res[2], 'author':res[1], 'price':res[3], 
-        #                     'subject':res[4], 'description':description, 
-        #                     'picture':res[6], 'id':res[7]}
-        #                 purchasedItems.append(tmp)
-        #         print(purchasedItems)
-        #         complete = True
-        #     except:
-        #         print "Error completing purchase"
-        #         conn.rollback()
-        #     conn.commit()
-        #     date = datetime.datetime.fromtimestamp(currentTime).strftime('%B %d, %Y')
-        # subtotal = float(subtotal)
-        # tax = subtotal * 0.053
-        # total = subtotal + tax + 5
-        # subtotal = '%.2f' %  subtotal
-        # tax = '%.2f' %  tax
-        # total = '%.2f' %  total
-    
+            subtotal = float(subtotal)
+            tax = subtotal * 0.053
+            total = subtotal + tax + 5
+            subtotal = '%.2f' %  subtotal
+            tax = '%.2f' %  tax
+            total = '%.2f' %  total
+        if request.method=="POST":
+            conn = connectToDB()
+            cur = conn.cursor()
+            currentTime = time.time()
+            date = datetime.datetime.fromtimestamp(currentTime).strftime('%Y-%m-%d %H:%M:%S')
+            try:
+                for item in cartItems:
+                    query = cur.mogrify("""INSERT INTO soldbooks (bookid, userid, purchasedate) VALUES (%s, %s, %s);""", (item, 
+                        currentUser, date))
+                    print(query)
+                    cur.execute(query)
+                    query = cur.mogrify("""UPDATE listedbooks SET sold='true' WHERE bookid=%s;""", (item,))
+                    print(query)
+                    cur.execute(query)
+                    query = cur.mogrify("""DELETE FROM cart WHERE bookid=%s;""", (item,))
+                    print query
+                    cur.execute(query)
+                    query = cur.mogrify("""SELECT lb.isbn, STRING_AGG(a.name, ', ' ORDER BY atb.priority), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl, \
+                    lb.bookid FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid INNER JOIN authors as a ON atb.authorid=a.authorid \
+                    WHERE lb.bookid=%s GROUP BY lb.bookid;""", (item,))
+                    print query
+                    cur.execute(query)
+                    result = cur.fetchall()
+                    for res in result:
+                        if res[5] != "":
+                            description = res[5]
+                        else:
+                            description = "No description available"
+                        tmp = {'isbn':res[0], 'title':res[2], 'author':res[1], 'price':res[3], 
+                            'subject':res[4], 'description':description, 
+                            'picture':res[6], 'id':res[7]}
+                        purchasedItems.append(tmp)
+                    purchaseStr += "<table border='1'><tr><td>" + tmp['title'] + "</td><td>" + tmp['author'] + "</td><td>" + tmp['isbn'] + "</td><td>" + str(tmp['price']) + "</td></tr><tr><td colspan='4'>" + tmp['description'] + "</td></tr></table><br />"
+                print(purchasedItems)
+                purchaseStr += "<br /><br />"
+                print(purchaseStr)
+                date = datetime.datetime.fromtimestamp(currentTime).strftime('%B %d, %Y')
+                
+                receiver=[currentUser]
+                sender = ['buymybooks350@gmail.com']
+                
+                receipt = "<p>Here is your receipt:</p><br />" + date + "<br /><br />"
+                receipt += purchaseStr
+                receipt += "<table border='1'><tr><td>Subtotal: " + subtotal + "</td></tr>"
+                receipt += "<tr><td>Tax: " + tax + "</td></tr>"
+                receipt += "<tr><td>Shipping: $5.00</td></tr>"
+                receipt += "<tr><td>Total: " + total + "</td></tr></table>"
+                print(receipt)
+                receipt += "<br /><br />Thank you, <br />BuyMyBooks"
+                
+                msg = MIMEMultipart('alternative')
+                emailMsg = MIMEText(receipt, 'html')
+                msg.attach(emailMsg)
+                
+                msg['Subject'] = 'Your receipt'
+                msg['From'] = 'buymybooks350@gmail.com'
+                msg['To'] = currentUser
+               
+                try:
+                    smtpObj = smtplib.SMTP("smtp.gmail.com", 587)
+                    smtpObj.ehlo()
+                    smtpObj.starttls()
+                    smtpObj.login('buymybooks350@gmail.com', 'zacharski350')
+                    smtpObj.sendmail(sender, receiver, msg.as_string())    
+                    smtpObj.quit()
+                    print "Successfully sent email"
+                    complete = True
+                except Exception as e:
+                    print(e)
+            except:
+                print "Error completing purchase"
+                conn.rollback()
+            conn.commit()
     return render_template('checkout.html', loggedIn=loggedIn, subtotal=subtotal, itemcount = itemcount, 
     tax=tax, total=total, complete=complete, purchasedItems=purchasedItems, date=date)
     
@@ -538,34 +573,6 @@ def account():
     return render_template('account.html', loggedIn=loggedIn, accountInfo=accountInfo, listedBooks=listedBooks, 
     itemDeleted=itemDeleted, editFailure=editFailure, purchasedBooks=purchasedBooks, soldBooks=soldBooks)
     
-@app.route('/edititem', methods=['GET', 'POST'])
-def edit():
-    item={}
-    loggedIn = False
-    if 'user' in session:
-        currentUser = session['user']
-        loggedIn = True
-    if request.method == "POST":
-        conn = connectToDB()
-        cur = conn.cursor()
-        if request.form.get("itemtoedit"):
-            try:
-                query = cur.mogrify("""SELECT lb.isbn, STRING_AGG(a.name, ', ' ORDER BY atb.priority), lb.title, lb.price, lb.subject, lb.description, lb.pictureurl \
-                FROM listedbooks as lb INNER JOIN authortobook as atb ON lb.bookid=atb.bookid INNER JOIN authors as a ON atb.authorid=a.authorid \
-                WHERE lb.bookid=%s GROUP BY lb.bookid;""", (request.form['itemtoedit'],))
-                print(query)
-                cur.execute(query)
-                results = cur.fetchall()
-                print results
-                if results != []:
-                    for result in results:
-                        item = {"isbn":result[0], 'title':result[2], 'author':result[1], 'price':result[3], 
-                        'subject':result[4], 'description':result[5], 'pictureurl':result[6]}
-                
-            except:
-                print("Error editing listing")
-                editFailure = True
-    return render_template('edititem.html', loggedIn=loggedIn, item=item)
 
 @app.route('/forgotpassword', methods=['GET', 'POST'])
 def forgotPassword():
