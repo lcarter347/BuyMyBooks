@@ -46,13 +46,14 @@ BuyMyBooksApp.controller('SearchController', function($scope, $window){
         console.log("book to delete: " + id)
     }
     
-    $scope.toggleCheck = function toggleCheck(sub) {
+    $scope.toggleCheck = function toggleCheck(sub){
         if ($scope.sub == false){
             $scope.sub = true;
         } else {
             $scope.sub = false;
         }
     }
+    
     
    var subjects = function subjects(){
        var subjectfilter = "";
